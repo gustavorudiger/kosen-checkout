@@ -1,0 +1,16 @@
+KOSEN SNEAKERS — SITE COM CHECKOUT MERCADO PAGO
+
+Pastas:
+  site/                     -> o site (index.html + catalogo.js)
+  site/catalogo.js          -> PREÇOS, produtos, estoque, frete, parcelas. Edite aqui.
+  netlify/functions/        -> o checkout (roda no servidor do Netlify)
+  netlify.toml              -> configuração do Netlify (não mexer)
+
+IMPORTANTE: este projeto NÃO funciona arrastando a pasta no Netlify
+(o arrastar não instala o checkout). Publique ligando ao GitHub
+ou pelo Netlify CLI.
+
+Variável obrigatória no Netlify (Project configuration > Environment variables):
+  MP_ACCESS_TOKEN = Access Token do Mercado Pago
+  (comece com o de TESTE; depois troque pelo de PRODUÇÃO e publique de novo)
+Nunca coloque o token dentro dos arquivos do site.
