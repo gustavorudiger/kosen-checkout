@@ -14,3 +14,4 @@ Variável obrigatória no Netlify (Project configuration > Environment variables
   MP_ACCESS_TOKEN = Access Token do Mercado Pago
   (comece com o de TESTE; depois troque pelo de PRODUÇÃO e publique de novo)
 Nunca coloque o token dentro dos arquivos do site.
+Ok.
