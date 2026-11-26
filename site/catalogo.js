@@ -14,7 +14,7 @@ export const LOJA = {
   descontoPix: 0.05,
   parcelas: 6,
   // FRETE (Melhor Envio) — CEP de onde o fornecedor despacha. Deixe "" para usar a estimativa fixa.
-  cepOrigem: "",
+  cepOrigem: "01021-200",   // fornecedor: Rua 25 de Março, 821, box 6 — São Paulo/SP
   caixa: { largura: 22, altura: 13, comprimento: 33, peso: 1.0 },   // caixa de tênis embalada (cm / kg)
   diasPostagem: 1,                                                   // dias até o fornecedor postar
   transportadoras: ["PAC", "SEDEX", ".Package", "J&T", "Loggi Express"], // quais aparecem no site
