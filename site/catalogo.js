@@ -13,6 +13,11 @@ export const LOJA = {
   freteGratisAcima: 399.90,
   descontoPix: 0.05,
   parcelas: 6,
+  // FRETE (Melhor Envio) — CEP de onde o fornecedor despacha. Deixe "" para usar a estimativa fixa.
+  cepOrigem: "",
+  caixa: { largura: 22, altura: 13, comprimento: 33, peso: 1.0 },   // caixa de tênis embalada (cm / kg)
+  diasPostagem: 1,                                                   // dias até o fornecedor postar
+  transportadoras: ["PAC", "SEDEX", ".Package", "J&T", "Loggi Express"], // quais aparecem no site
   levePares: 2, descontoPares: 0.10,  // leve 2 pares = 10% OFF
   avisos: [
     "<b>FRETE GRÁTIS</b> acima de R$ 399,90",
@@ -49,6 +54,13 @@ export const PRODUTOS = [
   {id:15,nome:"Tênis Couro Masculino Preto",      g:"M", estilo:"Casual",     cor:"#1d1d1d", det:"#e8e4db", sola:"#e8e4db", preco:299.90, de:349.90,tags:["outlet"], tam:MASC, esgotado:[]},
   {id:16,nome:"Tênis Slip-on Masculino Areia",    g:"M", estilo:"Slip-on",    cor:"#cbbfa7", det:"#a6977c", sola:"#ffffff", preco:229.90, de:null,  tags:[], tam:MASC, esgotado:[]},
 ];
+
+/* ITEM DE TESTE — R$ 10, sem frete e sem desconto.
+   Só aparece no site abrindo o endereço com ?teste  (ex.: kosen-checkout.netlify.app/?teste)
+   Para tirar: apague as 4 linhas abaixo e publique de novo. */
+const ITEM_TESTE = {id:999,nome:"Item de teste (pagamento R$ 10)", g:"F", estilo:"Casual", cor:"#e8e4db", det:"#191919", sola:"#ffffff", preco:10.00, de:null, tags:["new"], tam:[36], esgotado:[], teste:true};
+const verTeste = typeof location === "undefined" || /[?&]teste/.test(location.search);
+if (verTeste) PRODUTOS.push(ITEM_TESTE);
 export const ESTILOS = ["Casual","Plataforma","Esportivo","Slip-on"];
 
 /* ============================================================
@@ -67,9 +79,11 @@ export function opcoesFrete(cep){
 
 const r2 = v => Math.round(v*100)/100;
 
-/* Calcula o pedido. itens = [{id, t, q}], metodo = "pix" | "cartao".
-   Usado no site (para mostrar) e no servidor (para cobrar). */
-export function calcPedido(itens, cep, freteNome, metodo){
+/* Calcula o pedido. itens = [{id, t, q}], opcoes = lista de fretes (da cotação),
+   freteId = opção escolhida, metodo = "pix" | "cartao".
+   Usado no site (para mostrar) e no servidor (para cobrar).
+   Frete grátis acima de LOJA.freteGratisAcima vale para a opção mais barata. */
+export function calcPedido(itens, opcoes, freteId, metodo){
   const linhas = [];
   for(const i of (itens||[])){
     const p = PRODUTOS.find(x=>x.id===Number(i.id));
@@ -80,15 +94,20 @@ export function calcPedido(itens, cep, freteNome, metodo){
     linhas.push({p, t, q});
   }
   if(!linhas.length) throw new Error("Sacola vazia");
+  if(linhas.every(l=>l.p.teste)){
+    const total = r2(linhas.reduce((s,l)=>s+l.p.preco*l.q,0));
+    return { itens:linhas.map(l=>({...l, unit:l.p.preco})), pares:linhas.reduce((s,l)=>s+l.q,0), sub:total, base:total, gratis:true, frete:{id:"teste",nome:"Teste",valor:0,prazo:""}, opcoes:[], total };
+  }
+  if(linhas.some(l=>l.p.teste)) throw new Error("O item de teste deve ser comprado sozinho");
   const pares = linhas.reduce((s,l)=>s+l.q,0);
   const fator = (pares>=LOJA.levePares ? 1-LOJA.descontoPares : 1) * (metodo==="pix" ? 1-LOJA.descontoPix : 1);
   const itensCobrados = linhas.map(l=>({...l, unit:r2(l.p.preco*fator)}));
   const sub = r2(linhas.reduce((s,l)=>s+l.p.preco*l.q,0));
   const base = r2(sub*(pares>=LOJA.levePares ? 1-LOJA.descontoPares : 1));
   const gratis = base>=LOJA.freteGratisAcima;
-  const ops = opcoesFrete(cep);
-  const op = ops ? (ops.find(o=>o.nome===freteNome) || ops[0]) : null;
-  const frete = op ? ((gratis && op.nome==="PAC") ? 0 : op.valor) : 0;
+  const ops = (opcoes||[]).slice().sort((a,b)=>a.valor-b.valor)
+    .map((o,k)=>({...o, valor: (gratis && k===0) ? 0 : r2(o.valor)}));
+  const op = ops.find(o=>String(o.id)===String(freteId)) || ops[0] || null;
   const produtos = r2(itensCobrados.reduce((s,l)=>s+l.unit*l.q,0));
-  return { itens:itensCobrados, pares, sub, base, gratis, frete:op?{...op, valor:frete}:null, total:r2(produtos+frete) };
+  return { itens:itensCobrados, pares, sub, base, gratis, frete:op, opcoes:ops, total:r2(produtos+(op?op.valor:0)) };
 }

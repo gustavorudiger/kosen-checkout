@@ -716,9 +716,9 @@ function add(id){
   save("ks_cart",cart);
   const b=$("buy"+id); b.textContent="Pronto! Na sacola ✓"; b.classList.add("done");
   setTimeout(()=>{ state.picked[id]=undefined; render(); },1300);
-  renderCart(); toast(`${p.nome} · nº ${t} na sacola`);
+  renderCart(); if(ship) cotar(ship.cep); toast(`${p.nome} · nº ${t} na sacola`);
 }
-function chg(i,d){ cart[i].q+=d; if(cart[i].q<1) cart.splice(i,1); save("ks_cart",cart); renderCart(); }
+function chg(i,d){ cart[i].q+=d; if(cart[i].q<1) cart.splice(i,1); save("ks_cart",cart); renderCart(); if(ship&&cart.length) cotar(ship.cep); }
 
 function totals(){
   const items = cart.map(i=>({...i,p:PRODUTOS.find(x=>x.id===i.id)})).filter(i=>i.p);
@@ -727,7 +727,7 @@ function totals(){
   const desc = pares>=LOJA.levePares ? sub*LOJA.descontoPares : 0;
   const base = sub-desc;
   const gratis = base>=LOJA.freteGratisAcima;
-  const frete = gratis ? 0 : (ship?ship.valor:0);
+  const frete = (ship && shipOpts) ? ((gratis && shipOpts[0] && shipOpts[0].id===ship.id) ? 0 : ship.valor) : 0;
   return {items,pares,sub,desc,base,frete,gratis};
 }
 
@@ -743,7 +743,7 @@ function renderCart(){
       <div class="th">${media(i.p)}</div>
       <div><b>${i.p.nome}</b><small>Nº ${i.t} · ${brl(i.p.preco)}</small>
         <div class="qty"><button onclick="chg(${k},-1)">−</button>${i.q}<button onclick="chg(${k},1)">+</button></div></div>
-      <button class="rm" onclick="cart.splice(${k},1);save('ks_cart',cart);renderCart()">remover</button>
+      <button class="rm" onclick="chg(${k},-999)">remover</button>
     </div>`).join("") : `<div class="empty-cart">Sua sacola está vazia.<br><br><a href="#produtos" onclick="closeAll();go('F','all')" style="text-decoration:underline;font-weight:600;color:var(--ink)">Ver tênis femininos</a></div>`;
   $("cartFoot").style.display = T.items.length?"block":"none";
   $("sub").textContent = brl(T.sub);
@@ -752,8 +752,8 @@ function renderCart(){
   renderShip(T);
   let cartao = T.base+T.frete, totPix = pix(T.base)+T.frete;
   try{
-    const it = cart.map(i=>({id:i.id,t:i.t,q:i.q})), cep = ship?ship.cep:"", fn = ship?ship.nome:"";
-    if(it.length){ totPix = calcPedido(it,cep,fn,"pix").total; cartao = calcPedido(it,cep,fn,"cartao").total; }
+    const it = cart.map(i=>({id:i.id,t:i.t,q:i.q})), ops = shipOpts||[], fid = ship?ship.id:"";
+    if(it.length){ totPix = calcPedido(it,ops,fid,"pix").total; cartao = calcPedido(it,ops,fid,"cartao").total; }
   }catch(e){}
   $("tot").textContent = brl(totPix);
   $("parc").textContent = `${brl(cartao)} em ${LOJA.parcelas}x de ${brl(cartao/LOJA.parcelas)}`;
@@ -768,17 +768,36 @@ function renderCart(){
 }
 
 function maskCep(el){ let v=el.value.replace(/\D/g,"").slice(0,8); if(v.length>5) v=v.slice(0,5)+"-"+v.slice(5); el.value=v; }
-function calcShip(){
+let cotando=0;
+async function cotar(cepRaw){
+  const cep=String(cepRaw||"").replace(/\D/g,"");
+  if(cep.length!==8) return false;
+  const my=++cotando;
+  $("ship").innerHTML='<div class="muted" style="margin:6px 0">Calculando frete…</div>';
+  let ops;
+  try{
+    const r=await fetch("/api/frete",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({cep,itens:cart.map(i=>({id:i.id,t:i.t,q:i.q}))})});
+    const j=await r.json(); if(!r.ok||!j.opcoes||!j.opcoes.length) throw new Error(j.erro||"sem opções");
+    ops=j.opcoes;
+  }catch(e){ ops=opcoesFrete(cep).map(o=>({...o,id:o.nome})); }
+  if(my!==cotando) return false;
+  shipOpts=ops.slice().sort((a,b)=>a.valor-b.valor);
+  const keep = ship && shipOpts.find(o=>o.id===ship.id);
+  ship={...(keep||shipOpts[0]), cep:cep.slice(0,5)+"-"+cep.slice(5)};
+  renderCart(); return true;
+}
+async function calcShip(){
   const cep=$("cepIn").value.replace(/\D/g,"");
   if(cep.length!==8){ toast("Digite um CEP válido"); return; }
-  shipOpts=opcoesFrete(cep);
-  ship={...shipOpts[0],cep:$("cepIn").value}; renderCart();
+  await cotar(cep);
   if(!$("fCep").value) { $("fCep").value=$("cepIn").value; buscaCep(); }
 }
 function setShip(i){ ship={...shipOpts[i],cep:ship.cep}; renderCart(); }
 function renderShip(T){
   if(!shipOpts){ $("ship").innerHTML=""; return; }
-  $("ship").innerHTML = shipOpts.map((o,i)=>`<label><span><input type="radio" name="sh" ${ship.nome===o.nome?'checked':''} onchange="setShip(${i})">${o.nome} · ${o.prazo}</span><b>${T.gratis&&i===0?'Grátis':brl(o.valor)}</b></label>`).join("");
+  $("ship").innerHTML = shipOpts.map((o,i)=>`<label><span><input type="radio" name="sh" ${ship.id===o.id?'checked':''} onchange="setShip(${i})">${o.nome}${o.prazo?' · '+o.prazo:''}</span><b>${T.gratis&&i===0?'Grátis':brl(o.valor)}</b></label>`).join("")
+    + (shipOpts[0]&&shipOpts[0].estimado?'<div class="muted" style="font-size:11px">Valor estimado</div>':'');
 }
 
 function openCart(){ $("drawer").classList.add("show"); $("overlay").classList.add("show"); }
@@ -808,7 +827,7 @@ async function buscaCep(){
     ["fRua","fBairro","fCidade","fUf"].forEach(i=>$(i).classList.remove("bad"));
     if(!F("fRua")) $("fRua").value=j.logradouro||""; if(!F("fBairro")) $("fBairro").value=j.bairro||"";
     $("fCidade").value=j.localidade||F("fCidade"); $("fUf").value=j.uf||F("fUf");
-    if(!ship || ship.cep.replace(/\D/g,"")!==c){ shipOpts=opcoesFrete(c); ship={...shipOpts[0],cep:F("fCep")}; $("cepIn").value=F("fCep"); renderCart(); }
+    if(!ship || ship.cep.replace(/\D/g,"")!==c){ $("cepIn").value=F("fCep"); cotar(c); }
     $(F("fRua")?"fNum":"fRua").focus();
   }catch(e){}
 }
@@ -819,12 +838,12 @@ async function pagar(metodo){
   let ok=true; Object.entries(obrig).forEach(([i,v])=>{ $(i).classList.toggle("bad",!v); if(!v) ok=false; });
   if(!ok){ $("ckMsg").textContent="Confira os campos destacados (nome e sobrenome, e-mail, WhatsApp com DDD e endereço)."; return; }
   save("ks_cliente",cli);
-  if(!ship || ship.cep.replace(/\D/g,"")!==cli.cep.replace(/\D/g,"")){ shipOpts=opcoesFrete(cli.cep); ship={...shipOpts[0],cep:cli.cep}; renderCart(); }
+  if(!ship || ship.cep.replace(/\D/g,"")!==cli.cep.replace(/\D/g,"")){ $("cepIn").value=cli.cep; await cotar(cli.cep); }
   const bts=document.querySelectorAll(".pay"); bts.forEach(b=>b.disabled=true);
   $("ckMsg").style.color="var(--mute)"; $("ckMsg").textContent="Abrindo o pagamento seguro…";
   try{
     const r = await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({metodo,frete:ship.nome,cliente:cli,itens:cart.map(i=>({id:i.id,t:i.t,q:i.q}))})});
+      body:JSON.stringify({metodo,frete:ship?ship.id:"",cliente:cli,itens:cart.map(i=>({id:i.id,t:i.t,q:i.q}))})});
     const j = await r.json();
     if(!r.ok||!j.url) throw new Error(j.erro||"Erro ao abrir o pagamento");
     save("ks_ultimo",{pedido:j.pedido,itens:cart,cli,metodo,total:j.total,frete:ship});

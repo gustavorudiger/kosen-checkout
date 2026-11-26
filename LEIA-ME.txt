@@ -1,18 +1,19 @@
-KOSEN SNEAKERS — SITE COM CHECKOUT MERCADO PAGO
+KOSEN SNEAKERS — SITE COM CHECKOUT MERCADO PAGO + FRETE MELHOR ENVIO
 
 Pastas:
   site/                     -> o site (index.html + catalogo.js)
-  site/catalogo.js          -> PREÇOS, produtos, estoque, frete, parcelas. Edite aqui.
-  netlify/functions/        -> o checkout (roda no servidor do Netlify)
+  site/catalogo.js          -> PREÇOS, produtos, estoque, parcelas e FRETE. Edite aqui.
+  netlify/functions/        -> checkout e cotação de frete (rodam no servidor)
+  netlify/lib/frete.mjs     -> ligação com o Melhor Envio
   netlify.toml              -> configuração do Netlify (não mexer)
 
-IMPORTANTE: este projeto NÃO funciona arrastando a pasta no Netlify
-(o arrastar não instala o checkout). Publique ligando ao GitHub
-ou pelo Netlify CLI.
+FRETE: em site/catalogo.js preencha  cepOrigem: "00000-000"  com o CEP
+de onde o fornecedor despacha. Enquanto estiver vazio, o site usa a
+estimativa fixa (PAC/SEDEX por região).
 
-Variável obrigatória no Netlify (Project configuration > Environment variables):
-  MP_ACCESS_TOKEN = Access Token do Mercado Pago
-  (comece com o de TESTE; depois troque pelo de PRODUÇÃO e publique de novo)
-Nunca coloque o token dentro dos arquivos do site.
-Ok.
-Ok 2.
+Chaves obrigatórias no Netlify (Keys and secrets):
+  MP_ACCESS_TOKEN      = Access Token do Mercado Pago
+  MELHOR_ENVIO_TOKEN   = token de API do Melhor Envio
+Nunca coloque tokens dentro dos arquivos do site.
+
+Item de teste de R$ 10: abra o site com /?teste no fim do endereço.

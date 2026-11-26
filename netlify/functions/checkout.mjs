@@ -2,6 +2,7 @@
 // Os PREÇOS vêm do catálogo do servidor, nunca do navegador do cliente.
 // O Access Token fica só na variável de ambiente MP_ACCESS_TOKEN do Netlify.
 import { LOJA, calcPedido } from "../../site/catalogo.js";
+import { cotarFrete } from "../lib/frete.mjs";
 
 const limpa = (v, max = 120) => String(v ?? "").replace(/[<>]/g, "").trim().slice(0, max);
 const json = (obj, status = 200) => Response.json(obj, { status });
@@ -35,7 +36,10 @@ export default async (req, context) => {
 
   let ped;
   try {
-    ped = calcPedido(body.itens, cliente.cep, limpa(body.frete, 10), metodo);
+    const itens = Array.isArray(body.itens) ? body.itens.slice(0, 30) : [];
+    const soTeste = itens.length && itens.every(i => Number(i.id) === 999);
+    const opcoes = soTeste ? [] : await cotarFrete(cliente.cep, itens);   // frete recalculado aqui, não vem do navegador
+    ped = calcPedido(itens, opcoes, limpa(body.frete, 40), metodo);
   } catch (e) {
     return json({ erro: e.message }, 400);
   }
@@ -52,7 +56,7 @@ export default async (req, context) => {
     category_id: "fashion",
   }));
   if (ped.frete && ped.frete.valor > 0) {
-    items.push({ id: "frete", title: `Frete ${ped.frete.nome}`, quantity: 1, unit_price: ped.frete.valor, currency_id: "BRL" });
+    items.push({ id: "frete", title: `Frete ${ped.frete.nome}`.slice(0, 120), quantity: 1, unit_price: ped.frete.valor, currency_id: "BRL" });
   }
 
   const [primeiro, ...resto] = cliente.nome.split(" ");
@@ -81,7 +85,7 @@ export default async (req, context) => {
     },
     auto_return: "approved",
     metadata: {
-      pedido: pedidoId, metodo, frete: ped.frete ? `${ped.frete.nome} ${ped.frete.valor}` : "",
+      pedido: pedidoId, metodo, frete: ped.frete ? `${ped.frete.nome} ${ped.frete.valor} (${ped.frete.prazo || ""})` : "",
       cliente: `${cliente.nome} | ${cliente.fone} | ${cliente.rua}, ${cliente.numero} ${cliente.comp} - ${cliente.bairro} - ${cliente.cidade}/${cliente.uf} - CEP ${cliente.cep}`,
     },
   };
