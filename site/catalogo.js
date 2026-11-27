@@ -38,22 +38,81 @@ export const LOJA = {
    ============================================================ */
 export const FEM = [33,34,35,36,37,38,39,40], MASC = [37,38,39,40,41,42,43,44];
 export const PRODUTOS = [
-  {id:1, nome:"Tênis Plataforma Cloud Off White", g:"F", estilo:"Plataforma", cor:"#f4f1ea", det:"#d8cfbf", sola:"#ffffff", preco:299.90, de:null,  tags:["new","best"], tam:FEM, esgotado:[33]},
-  {id:2, nome:"Tênis Casual Nude Couro",          g:"F", estilo:"Casual",     cor:"#e2c9b3", det:"#c9a88c", sola:"#f7f3ec", preco:269.90, de:null,  tags:["best"], tam:FEM, esgotado:[]},
-  {id:3, nome:"Tênis Chunky Areia",               g:"F", estilo:"Plataforma", cor:"#d6cbb6", det:"#191919", sola:"#efe8db", preco:329.90, de:379.90,tags:["outlet"], tam:FEM, esgotado:[39,40]},
-  {id:4, nome:"Tênis Slip-on Preto Knit",         g:"F", estilo:"Slip-on",    cor:"#1f1f1f", det:"#3a3a3a", sola:"#ffffff", preco:219.90, de:null,  tags:["new"], tam:FEM, esgotado:[]},
-  {id:5, nome:"Tênis Runner Rosé",                g:"F", estilo:"Esportivo",  cor:"#e7c6c2", det:"#ffffff", sola:"#f6f2ee", preco:289.90, de:null,  tags:["pre"], pre:"10/12", tam:FEM, esgotado:[]},
-  {id:6, nome:"Tênis Plataforma Preto e Branco",  g:"F", estilo:"Plataforma", cor:"#ffffff", det:"#191919", sola:"#191919", preco:309.90, de:null,  tags:["new"], tam:FEM, esgotado:[]},
-  {id:7, nome:"Tênis Casual Verde Oliva",         g:"F", estilo:"Casual",     cor:"#8f9775", det:"#f2efe7", sola:"#f2efe7", preco:249.90, de:289.90,tags:["outlet"], tam:FEM, esgotado:[34]},
-  {id:8, nome:"Tênis Retrô Bege e Marrom",        g:"F", estilo:"Casual",     cor:"#efe6d6", det:"#7a5a43", sola:"#e5d7bd", preco:279.90, de:null,  tags:["best"], tam:FEM, esgotado:[]},
-  {id:9, nome:"Tênis Slip-on Caramelo Camurça",   g:"F", estilo:"Slip-on",    cor:"#b98656", det:"#9a6c43", sola:"#f4efe6", preco:199.90, de:239.90,tags:["outlet","best"], tam:FEM, esgotado:[]},
-  {id:10,nome:"Tênis Runner Branco Gelo",         g:"F", estilo:"Esportivo",  cor:"#f3f3f1", det:"#bfc6c9", sola:"#ffffff", preco:259.90, de:null,  tags:["new"], tam:FEM, esgotado:[]},
-  {id:11,nome:"Tênis Plataforma Bordô",           g:"F", estilo:"Plataforma", cor:"#6e2a30", det:"#f2ece2", sola:"#f2ece2", preco:319.90, de:null,  tags:["new"], tam:FEM, esgotado:[]},
-  {id:12,nome:"Tênis Casual Preto Total",         g:"F", estilo:"Casual",     cor:"#191919", det:"#191919", sola:"#2a2a2a", preco:259.90, de:null,  tags:[], tam:FEM, esgotado:[]},
-  {id:13,nome:"Tênis Casual Masculino Off White", g:"M", estilo:"Casual",     cor:"#efebe3", det:"#191919", sola:"#ffffff", preco:289.90, de:null,  tags:["new"], tam:MASC, esgotado:[]},
-  {id:14,nome:"Tênis Runner Masculino Grafite",   g:"M", estilo:"Esportivo",  cor:"#4a4b4d", det:"#e8e4db", sola:"#e8e4db", preco:319.90, de:null,  tags:["best"], tam:MASC, esgotado:[44]},
-  {id:15,nome:"Tênis Couro Masculino Preto",      g:"M", estilo:"Casual",     cor:"#1d1d1d", det:"#e8e4db", sola:"#e8e4db", preco:299.90, de:349.90,tags:["outlet"], tam:MASC, esgotado:[]},
-  {id:16,nome:"Tênis Slip-on Masculino Areia",    g:"M", estilo:"Slip-on",    cor:"#cbbfa7", det:"#a6977c", sola:"#ffffff", preco:229.90, de:null,  tags:[], tam:MASC, esgotado:[]},
+  {
+    "id": 101,
+    "nome": "On Cloudsurfer Max - Off-Amêndoa",
+    "g": "F",
+    "estilo": "Esportivo",
+    "cor": "#eeeeee",
+    "det": "#222222",
+    "sola": "#ffffff",
+    "preco": 301.52,
+    "de": null,
+    "tags": [
+      "new"
+    ],
+    "tam": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "esgotado": [],
+    "img": "fotos/off-amendoa-1.webp",
+    "imgs": [
+      "fotos/off-amendoa-1.webp",
+      "fotos/off-amendoa-2.webp",
+      "fotos/off-amendoa-3.webp",
+      "fotos/off-amendoa-4.webp",
+      "fotos/off-amendoa-5.webp"
+    ]
+  },
+  {
+    "id": 102,
+    "nome": "On Cloudsurfer Max - Gelo-Preto",
+    "g": "F",
+    "estilo": "Esportivo",
+    "cor": "#eeeeee",
+    "det": "#222222",
+    "sola": "#ffffff",
+    "preco": 301.52,
+    "de": null,
+    "tags": [
+      "new"
+    ],
+    "tam": [
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "esgotado": [],
+    "img": "fotos/gelo-preto-1.webp",
+    "imgs": [
+      "fotos/gelo-preto-1.webp",
+      "fotos/gelo-preto-2.webp",
+      "fotos/gelo-preto-3.webp",
+      "fotos/gelo-preto-4.webp",
+      "fotos/gelo-preto-5.webp",
+      "fotos/gelo-preto-6.webp"
+    ]
+  }
 ];
 
 /* ITEM DE TESTE — R$ 10, sem frete e sem desconto.

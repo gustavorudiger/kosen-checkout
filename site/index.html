@@ -690,7 +690,7 @@ function card(p){
       <button class="fav ${fav?'on':''}" onclick="toggleFav(${p.id})" aria-label="Favoritar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></button>
       ${allOut?'<div class="sold">ESGOTADO</div>':''}
       <span class="gtag">${p.g==="F"?"FEMININO":"MASCULINO"} · ${p.estilo.toUpperCase()}</span>
-      <div class="ph">${media(p)}</div>
+      <div class="ph">${media(p)}</div>${p.imgs?.length>1?`<div style="position:absolute;bottom:28px;left:8px;right:8px;display:flex;gap:4px;z-index:3;justify-content:center">${p.imgs.map(src=>`<button aria-label="Ver foto" style="width:34px;height:34px;border:1px solid white;border-radius:5px;overflow:hidden" onclick="this.closest('.img').querySelector('.ph img').src='${src}'"><img src="${src}" style="width:100%;height:100%;object-fit:cover"></button>`).join('')}</div>`:''}
     </div>
     <h3>${p.nome}</h3>
     <div class="price">
