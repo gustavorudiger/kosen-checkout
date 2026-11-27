@@ -371,7 +371,7 @@
   <div class="perks">
     <div class="perk"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="22" height="15" rx="2"/><path d="M3 12h22"/></svg><div><b>6x sem juros</b><span>no cartão de crédito</span></div></div>
     <div class="perk"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3l11 11-11 11L3 14z"/></svg><div><b>5% OFF no PIX</b><span>desconto automático</span></div></div>
-    <div class="perk"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h14v11H2zM16 12h5l4 4v3h-9"/><circle cx="7" cy="21" r="2"/><circle cx="21" cy="21" r="2"/></svg><div><b>Frete grátis</b><span>acima de R$ 399,90</span></div></div>
+    <div class="perk"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 8h14v11H2zM16 12h5l4 4v3h-9"/><circle cx="7" cy="21" r="2"/><circle cx="21" cy="21" r="2"/></svg><div><b>Frete grátis</b><span>para todo o Brasil</span></div></div>
     <div class="perk"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 14a10 10 0 0 1 18-6M24 14a10 10 0 0 1-18 6"/><path d="M22 3v5h-5M6 25v-5h5"/></svg><div><b>Troca fácil</b><span>primeira troca grátis</span></div></div>
   </div>
 
@@ -555,7 +555,7 @@
   <div class="drawer-f" id="cartFoot">
     <div class="row"><span>Subtotal</span><b id="sub">R$ 0,00</b></div>
     <div class="row disc" id="discRow"></div>
-    <div style="font-size:13px;font-weight:700;margin-top:10px">Calcular frete</div>
+    <div style="font-size:13px;font-weight:700;margin-top:10px" id="shipLbl">Calcular frete</div>
     <div class="cep">
       <input id="cepIn" placeholder="00000-000" maxlength="9" inputmode="numeric" oninput="maskCep(this)">
       <button onclick="calcShip()">OK</button>
@@ -726,8 +726,8 @@ function totals(){
   const sub = items.reduce((s,i)=>s+i.p.preco*i.q,0);
   const desc = pares>=LOJA.levePares ? sub*LOJA.descontoPares : 0;
   const base = sub-desc;
-  const gratis = base>=LOJA.freteGratisAcima;
-  const frete = (ship && shipOpts) ? ((gratis && shipOpts[0] && shipOpts[0].id===ship.id) ? 0 : ship.valor) : 0;
+  const gratis = LOJA.freteSempreGratis || base>=LOJA.freteGratisAcima;
+  const frete = LOJA.freteSempreGratis ? 0 : (ship && shipOpts) ? ((gratis && shipOpts[0] && shipOpts[0].id===ship.id) ? 0 : ship.valor) : 0;
   return {items,pares,sub,desc,base,frete,gratis};
 }
 
@@ -735,7 +735,9 @@ function renderCart(){
   const T = totals();
   $("count").textContent = T.pares;
   const falta = Math.max(0,LOJA.freteGratisAcima-T.base);
-  $("free").innerHTML = (falta>0?`Faltam <b>${brl(falta)}</b> para o <b>frete grátis</b>`:`Você ganhou <b>frete grátis</b>! ✦`)
+  if(LOJA.freteSempreGratis) $("free").innerHTML = `<b>Frete grátis</b> para todo o Brasil ✦`
+    + (T.pares===1?`<br>Leve mais 1 par e ganhe <b>10% OFF</b>`:"");
+  else $("free").innerHTML = (falta>0?`Faltam <b>${brl(falta)}</b> para o <b>frete grátis</b>`:`Você ganhou <b>frete grátis</b>! ✦`)
     + (T.pares===1?`<br>Leve mais 1 par e ganhe <b>10% OFF</b>`:"")
     + `<div class="bar"><i style="width:${Math.min(100,T.base/LOJA.freteGratisAcima*100)}%"></i></div>`;
   $("items").innerHTML = T.items.length ? T.items.map((i,k)=>`
@@ -759,7 +761,7 @@ function renderCart(){
   $("parc").textContent = `${brl(cartao)} em ${LOJA.parcelas}x de ${brl(cartao/LOJA.parcelas)}`;
   $("ckTotPix").textContent = brl(totPix); $("ckTotCard").textContent = `${brl(cartao)} em até ${LOJA.parcelas}x sem juros`;
   const linhas = T.items.map(i=>`• ${i.q}x ${i.p.nome} — Nº ${i.t} — ${brl(i.p.preco*i.q)}`).join("\n");
-  const freteTxt = T.gratis ? "Grátis" : ship ? `${brl(T.frete)} (${ship.nome})` : "a calcular";
+  const freteTxt = T.gratis ? ("Grátis" + (ship&&ship.prazo ? ` (chega em ${ship.prazo})` : "")) : ship ? `${brl(T.frete)} (${ship.nome})` : "a calcular";
   const msg = `Olá! Quero fazer este pedido na ${LOJA.nome}:\n\n${linhas}\n\nSubtotal: ${brl(T.sub)}`
     + (T.desc?`\nLeve 2 pares (10%): -${brl(T.desc)}`:"")
     + `\nFrete: ${freteTxt}` + (ship?`\nCEP: ${ship.cep}`:"")
@@ -773,7 +775,7 @@ async function cotar(cepRaw){
   const cep=String(cepRaw||"").replace(/\D/g,"");
   if(cep.length!==8) return false;
   const my=++cotando;
-  $("ship").innerHTML='<div class="muted" style="margin:6px 0">Calculando frete…</div>';
+  $("ship").innerHTML=`<div class="muted" style="margin:6px 0">${LOJA.freteSempreGratis?"Calculando prazo…":"Calculando frete…"}</div>`;
   let ops;
   try{
     const r=await fetch("/api/frete",{method:"POST",headers:{"Content-Type":"application/json"},
@@ -783,6 +785,7 @@ async function cotar(cepRaw){
   }catch(e){ ops=opcoesFrete(cep).map(o=>({...o,id:o.nome})); }
   if(my!==cotando) return false;
   shipOpts=ops.slice().sort((a,b)=>a.valor-b.valor);
+  if(LOJA.freteSempreGratis) shipOpts=shipOpts.slice(0,1);   // frete grátis: só a opção mais barata, para mostrar o prazo
   const keep = ship && shipOpts.find(o=>o.id===ship.id);
   ship={...(keep||shipOpts[0]), cep:cep.slice(0,5)+"-"+cep.slice(5)};
   renderCart(); return true;
@@ -795,7 +798,14 @@ async function calcShip(){
 }
 function setShip(i){ ship={...shipOpts[i],cep:ship.cep}; renderCart(); }
 function renderShip(T){
+  $("shipLbl").textContent = LOJA.freteSempreGratis ? "Prazo de entrega" : "Calcular frete";
   if(!shipOpts){ $("ship").innerHTML=""; return; }
+  if(LOJA.freteSempreGratis){
+    const o=shipOpts[0];
+    $("ship").innerHTML = o ? `<div style="display:flex;justify-content:space-between;margin:6px 0"><span>${o.prazo?"Chega em "+o.prazo:"Prazo a confirmar"}</span><b>Frete grátis</b></div>`
+      + (o.estimado?'<div class="muted" style="font-size:11px">Prazo estimado</div>':'') : "";
+    return;
+  }
   $("ship").innerHTML = shipOpts.map((o,i)=>`<label><span><input type="radio" name="sh" ${ship.id===o.id?'checked':''} onchange="setShip(${i})">${o.nome}${o.prazo?' · '+o.prazo:''}</span><b>${T.gratis&&i===0?'Grátis':brl(o.valor)}</b></label>`).join("")
     + (shipOpts[0]&&shipOpts[0].estimado?'<div class="muted" style="font-size:11px">Valor estimado</div>':'');
 }

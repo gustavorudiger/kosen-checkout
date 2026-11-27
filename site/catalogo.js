@@ -10,7 +10,8 @@ export const LOJA = {
   nome: "Kosen Sneakers",
   whatsapp: "5546999368728",          // 55 + DDD + número que recebe os pedidos
   whatsappTexto: "(46) 9 9936-8728",
-  freteGratisAcima: 399.90,
+  freteSempreGratis: true,            // true = frete grátis em TODOS os pedidos (o Melhor Envio só mostra o prazo)
+  freteGratisAcima: 399.90,           // só vale se freteSempreGratis for false
   descontoPix: 0.05,
   parcelas: 6,
   // FRETE (Melhor Envio) — CEP de onde o fornecedor despacha. Deixe "" para usar a estimativa fixa.
@@ -20,7 +21,7 @@ export const LOJA = {
   transportadoras: ["PAC", "SEDEX", ".Package", "J&T", "Loggi Express"], // quais aparecem no site
   levePares: 2, descontoPares: 0.10,  // leve 2 pares = 10% OFF
   avisos: [
-    "<b>FRETE GRÁTIS</b> acima de R$ 399,90",
+    "<b>FRETE GRÁTIS</b> para todo o Brasil",
     "<b>6x SEM JUROS</b> no cartão",
     "<b>5% OFF</b> pagando no PIX",
     "<b>LEVE 2 PARES</b> e ganhe 10% OFF",
@@ -82,7 +83,8 @@ const r2 = v => Math.round(v*100)/100;
 /* Calcula o pedido. itens = [{id, t, q}], opcoes = lista de fretes (da cotação),
    freteId = opção escolhida, metodo = "pix" | "cartao".
    Usado no site (para mostrar) e no servidor (para cobrar).
-   Frete grátis acima de LOJA.freteGratisAcima vale para a opção mais barata. */
+   Com LOJA.freteSempreGratis, o frete é sempre R$ 0 (só a opção mais barata, para mostrar o prazo).
+   Senão, frete grátis acima de LOJA.freteGratisAcima vale para a opção mais barata. */
 export function calcPedido(itens, opcoes, freteId, metodo){
   const linhas = [];
   for(const i of (itens||[])){
@@ -104,9 +106,10 @@ export function calcPedido(itens, opcoes, freteId, metodo){
   const itensCobrados = linhas.map(l=>({...l, unit:r2(l.p.preco*fator)}));
   const sub = r2(linhas.reduce((s,l)=>s+l.p.preco*l.q,0));
   const base = r2(sub*(pares>=LOJA.levePares ? 1-LOJA.descontoPares : 1));
-  const gratis = base>=LOJA.freteGratisAcima;
-  const ops = (opcoes||[]).slice().sort((a,b)=>a.valor-b.valor)
-    .map((o,k)=>({...o, valor: (gratis && k===0) ? 0 : r2(o.valor)}));
+  const gratis = LOJA.freteSempreGratis || base>=LOJA.freteGratisAcima;
+  let ops = (opcoes||[]).slice().sort((a,b)=>a.valor-b.valor);
+  if(LOJA.freteSempreGratis) ops = ops.slice(0,1);
+  ops = ops.map((o,k)=>({...o, valor: (gratis && k===0) ? 0 : r2(o.valor)}));
   const op = ops.find(o=>String(o.id)===String(freteId)) || ops[0] || null;
   const produtos = r2(itensCobrados.reduce((s,l)=>s+l.unit*l.q,0));
   return { itens:itensCobrados, pares, sub, base, gratis, frete:op, opcoes:ops, total:r2(produtos+(op?op.valor:0)) };
