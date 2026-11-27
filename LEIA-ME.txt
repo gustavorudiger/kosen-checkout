@@ -17,3 +17,4 @@ Chaves obrigatórias no Netlify (Keys and secrets):
 Nunca coloque tokens dentro dos arquivos do site.
 
 Item de teste de R$ 10: abra o site com /?teste no fim do endereço.
+
