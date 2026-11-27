@@ -61,6 +61,11 @@
   .hero-art .shoe{position:absolute;width:92%;left:2%;top:50%;transform:translateY(-38%) rotate(-10deg);filter:drop-shadow(0 34px 30px rgba(25,25,25,.28))}
   .hero-art .hang{position:absolute;width:120px;right:12%;top:8%;transform:rotate(9deg);transform-origin:50% 0;animation:swing 4s ease-in-out infinite;border-radius:12px;box-shadow:0 16px 30px rgba(0,0,0,.18)}
   .hero-art .string{position:absolute;right:calc(12% + 58px);top:-4px;width:2px;height:34px;background:#9b958a}
+  .hero-art .shoe.foto{height:84%;width:auto;left:46%;top:50%;transform:translate(-50%,-50%) rotate(-3deg);aspect-ratio:3/4;border-radius:22px;overflow:hidden;filter:drop-shadow(0 24px 26px rgba(25,25,25,.25))}
+  .hero-art .shoe.foto img,.gen .ph.foto img{width:100%;height:100%;object-fit:cover;display:block}
+  .gen .ph.foto{padding:0}
+  .gen .ph.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,0) 55%)}
+  .gen:has(.ph.foto) h3,.gen:has(.ph.foto) .go{color:#fff}
   @keyframes swing{0%,100%{transform:rotate(7deg)}50%{transform:rotate(-4deg)}}
 
   /* Benefícios */
@@ -382,12 +387,12 @@
       <a href="#produtos" class="gen f" onclick="go('F','all')">
         <div class="ph" id="genF"></div>
         <h3>Feminino</h3>
-        <div class="go">Do 33 ao 40 · <span id="nF"></span><span class="arr">→</span></div>
+        <div class="go">Do 34 ao 40 · <span id="nF"></span><span class="arr">→</span></div>
       </a>
       <a href="#produtos" class="gen m" onclick="go('M','all')">
         <div class="ph" id="genM"></div>
         <h3>Masculino</h3>
-        <div class="go">Do 37 ao 44 · <span id="nM"></span><span class="arr">→</span></div>
+        <div class="go">Do 37 ao 45 · <span id="nM"></span><span class="arr">→</span></div>
       </a>
     </div>
     <div class="styles" id="styles"></div>
@@ -600,7 +605,7 @@ function shoe(estilo, cor, det, sola){
     ${plat?`<path d="M14 ${y+sh/2+1}h212" stroke="rgba(25,25,25,.12)" stroke-width="1.5"/>`:""}
   </svg>`;
 }
-const media = p => p.img ? `<img src="${p.img}" alt="${p.nome}" style="width:100%;height:100%;object-fit:cover">` : shoe(p.estilo,p.cor,p.det,p.sola);
+const media = p => p.img ? `<img src="${p.img}" alt="${p.nome}" loading="lazy" style="width:100%;height:100%;object-fit:cover">` : shoe(p.estilo,p.cor,p.det,p.sola);
 
 /* ============================================================
    Utilidades
@@ -620,13 +625,20 @@ let ship = null, shipOpts = null;
    Render
    ============================================================ */
 function init(){
+  cart = cart.filter(i=>PRODUTOS.some(p=>p.id===i.id && p.tam.includes(i.t))); save("ks_cart",cart);   /* tira da sacola itens que saíram do catálogo */
   const t = LOJA.avisos.map(a=>`<span>${a}</span><span>✦</span>`).join("");
   $("track").innerHTML = t+t+t;
-  $("heroShoe").innerHTML = shoe("Plataforma","#f7f4ee","#191919","#ffffff");
-  $("genF").innerHTML = shoe("Plataforma","#ffffff","#c9a88c","#f7f3ec");
-  $("genM").innerHTML = shoe("Casual","#e8e4db","#191919","#ffffff");
-  $("nF").textContent = PRODUTOS.filter(p=>p.g==="F").length+" modelos";
-  $("nM").textContent = PRODUTOS.filter(p=>p.g==="M").length+" modelos";
+  /* Banner e categorias: usam a 1ª foto real do catálogo; sem foto, fica o desenho */
+  const fotoDe = g => (PRODUTOS.find(p=>p.hero && p.img && (!g || p.g===g)) || PRODUTOS.find(p=>p.img && !p.teste && (!g || p.g===g))||{}).img;
+  const hf = fotoDe(""), ff = fotoDe("F"), mf = fotoDe("M");
+  if(hf){ $("heroShoe").classList.add("foto"); $("heroShoe").innerHTML = `<img src="${hf}" alt="Tênis Kosen">`; }
+  else $("heroShoe").innerHTML = shoe("Plataforma","#f7f4ee","#191919","#ffffff");
+  if(ff){ $("genF").classList.add("foto"); $("genF").innerHTML = `<img src="${ff}" alt="Tênis femininos">`; }
+  else $("genF").innerHTML = shoe("Plataforma","#ffffff","#c9a88c","#f7f3ec");
+  if(mf){ $("genM").classList.add("foto"); $("genM").innerHTML = `<img src="${mf}" alt="Tênis masculinos">`; }
+  else $("genM").innerHTML = shoe("Casual","#e8e4db","#191919","#ffffff");
+  $("nF").textContent = PRODUTOS.filter(p=>!p.teste&&(p.g==="F"||p.g==="U")).length+" modelos";
+  $("nM").textContent = PRODUTOS.filter(p=>!p.teste&&(p.g==="M"||p.g==="U")).length+" modelos";
   $("styles").innerHTML = ESTILOS.map(e=>`<a href="#produtos" class="style" onclick="state.estilo='${e}';go('F','all')"><span>${e}</span><svg class="mini" viewBox="0 0 240 140">${shoe(e,"#efebe3","#191919","#ffffff").replace(/^<svg[^>]*>|<\/svg>$/g,"")}</svg></a>`).join("");
   $("reels").innerHTML = ["Look do dia","Unboxing","Como combinar","Lançamentos","Bastidores"].map(n=>`
     <div class="reel"><div class="play"><svg width="20" height="20" fill="currentColor"><path d="M5 3l12 7-12 7z"/></svg></div><small>${n}</small></div>`).join("");
@@ -657,7 +669,7 @@ function filtered(){
   if(state.tab==="lanc") l=l.filter(p=>p.tags.includes("new")||p.tags.includes("pre"));
   if(state.tab==="best") l=l.filter(p=>p.tags.includes("best"));
   if(state.tab==="outlet") l=l.filter(p=>p.tags.includes("outlet")||p.de);
-  if(state.gen) l=l.filter(p=>p.g===state.gen);
+  if(state.gen) l=l.filter(p=>p.g===state.gen||p.g==="U");
   if(state.estilo) l=l.filter(p=>p.estilo===state.estilo);
   if(state.size) l=l.filter(p=>p.tam.includes(state.size)&&!p.esgotado.includes(state.size));
   if(state.q){ const q=state.q.toLowerCase(); l=l.filter(p=>(p.nome+" "+p.estilo).toLowerCase().includes(q)); }
@@ -689,8 +701,8 @@ function card(p){
       <div class="tags">${tags.join("")}</div>
       <button class="fav ${fav?'on':''}" onclick="toggleFav(${p.id})" aria-label="Favoritar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></button>
       ${allOut?'<div class="sold">ESGOTADO</div>':''}
-      <span class="gtag">${p.g==="F"?"FEMININO":"MASCULINO"} · ${p.estilo.toUpperCase()}</span>
-      <div class="ph">${media(p)}</div>${p.imgs?.length>1?`<div style="position:absolute;bottom:28px;left:8px;right:8px;display:flex;gap:4px;z-index:3;justify-content:center">${p.imgs.map(src=>`<button aria-label="Ver foto" style="width:34px;height:34px;border:1px solid white;border-radius:5px;overflow:hidden" onclick="this.closest('.img').querySelector('.ph img').src='${src}'"><img src="${src}" style="width:100%;height:100%;object-fit:cover"></button>`).join('')}</div>`:''}
+      <span class="gtag">${p.g==="F"?"FEMININO":p.g==="M"?"MASCULINO":"UNISSEX"} · ${p.estilo.toUpperCase()}</span>
+      <div class="ph">${media(p)}</div>${p.imgs?.length>1?`<div style="position:absolute;bottom:28px;left:8px;right:8px;display:flex;gap:4px;z-index:3;justify-content:center">${p.imgs.map(src=>`<button aria-label="Ver foto" style="width:34px;height:34px;border:1px solid white;border-radius:5px;overflow:hidden" onclick="this.closest('.img').querySelector('.ph img').src='${src}'"><img src="${src}" loading="lazy" style="width:100%;height:100%;object-fit:cover"></button>`).join('')}</div>`:''}
     </div>
     <h3>${p.nome}</h3>
     <div class="price">
@@ -886,7 +898,7 @@ function retornoPagamento(){
 
 </script>
 <script type="module">
-import * as C from "./catalogo.js";
+import * as C from "./catalogo.js?v=2026-11-27c";  /* troque o v= sempre que mudar o catálogo */
 Object.assign(window, C);
 init(); retornoPagamento();
 </script>
