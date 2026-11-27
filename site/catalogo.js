@@ -9,7 +9,9 @@
 export const LOJA = {
   nome: "Kosen Sneakers",
   whatsapp: "5546999368728",          // 55 + DDD + número que recebe os pedidos
-  whatsappTexto: "(46) 9 9936-8728",
+  whatsappTexto: "(46) 99936-8728",
+  email: "usekosen@gmail.com",
+  cnpj: "66.966.835/0001-09",
   freteSempreGratis: true,            // true = frete grátis em TODOS os pedidos (o Melhor Envio só mostra o prazo)
   freteGratisAcima: 399.90,           // só vale se freteSempreGratis for false
   descontoPix: 0.05,
