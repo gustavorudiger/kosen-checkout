@@ -29,3 +29,4 @@ WEBHOOK DO MERCADO PAGO (obrigatório para o site saber que a venda foi paga)
 
 ITEM DE TESTE de R$ 10: abra o site com /?teste no fim do endereço.
 Ao mudar o catalogo.js, troque o v= no fim do index.html (ex.: v=2026-11-28a).
+
