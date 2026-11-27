@@ -4,7 +4,7 @@
 import { createHash, createHmac, randomBytes, randomInt, scryptSync, timingSafeEqual } from "node:crypto";
 import { getStore } from "@netlify/blobs";
 import { pedidosDoEmail, contarTentativa, zerarTentativas, STATUS } from "../lib/pedidos.mjs";
-import { enviarEmail } from "../lib/avisos.mjs";
+import { enviarEmail, modeloEmail, RODAPE_TEXTO } from "../lib/avisos.mjs";
 
 const json = (obj, status = 200) => Response.json(obj, { status, headers: { "Cache-Control": "no-store" } });
 const contas = () => getStore({ name: "contas", consistency: "strong" });
@@ -42,8 +42,9 @@ async function mandarCodigo(email, nome, motivo) {
   const cod = String(randomInt(100000, 1000000));
   const ok = await enviarEmail({
     para: email,
-    assunto: `Kosen Sneakers — seu código: ${cod}`,
-    texto: `Oi${nome ? ", " + nome.split(" ")[0] : ""}! Seu código para ${motivo} é: ${cod}\n\nEle vale por 15 minutos. Se não foi você, ignore este e-mail.\n\nKosen Sneakers`,
+    assunto: `${cod} é o seu código da Kosen Sneakers`,
+    texto: `Oi${nome ? ", " + nome.split(" ")[0] : ""}!\n\nSeu código para ${motivo} na Kosen Sneakers é: ${cod}\n\nDigite esse código no site para continuar. Ele vale por 15 minutos.\n\nSe você não pediu este código, pode ignorar este e-mail: nada muda na sua conta.\n\n${RODAPE_TEXTO}`,
+    html: modeloEmail("Seu código de confirmação", `<p>Oi${nome ? ", " + String(nome.split(" ")[0]).replace(/[&<>"]/g, "") : ""}!</p><p>Use o código abaixo para ${motivo} na Kosen Sneakers:</p><p style="text-align:center;margin:22px 0"><span style="display:inline-block;background:#f5f2ec;border-radius:10px;padding:14px 22px;font-size:28px;font-weight:bold;letter-spacing:6px">${cod}</span></p><p>Digite esse código no site para continuar. Ele vale por <b>15 minutos</b>.</p><p style="color:#7a756c;font-size:13px">Se você não pediu este código, pode ignorar este e-mail: nada muda na sua conta.</p>`),
   });
   return ok ? { hash: hashCodigo(cod), exp: Date.now() + 15 * 60000, tent: 0 } : null;
 }

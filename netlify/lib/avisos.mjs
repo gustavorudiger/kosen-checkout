@@ -11,6 +11,25 @@ const env = k => (globalThis.Netlify ? Netlify.env.get(k) : process.env[k]) || "
 const brl = v => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+// Modelo de e-mail com a marca da loja (HTML simples + rodapé com os dados da empresa).
+// E-mails com marca, texto completo e dados de contato caem menos no spam do que mensagens curtas só com código.
+export const RODAPE_TEXTO = "Kosen Sneakers · CNPJ 66.966.835/0001-09\nWhatsApp (46) 99936-8728 · usekosen@gmail.com\nhttps://usekosen.com.br";
+export function modeloEmail(titulo, corpoHtml) {
+  return `<!doctype html><html lang="pt-BR"><body style="margin:0;padding:0;background:#f5f2ec">
+<div style="max-width:520px;margin:0 auto;padding:24px 16px;font-family:Arial,Helvetica,sans-serif;color:#1a1a1a">
+  <div style="text-align:center;padding:8px 0 18px;font-size:20px;font-weight:bold;letter-spacing:2px">KOSEN SNEAKERS</div>
+  <div style="background:#ffffff;border-radius:12px;padding:24px 22px;font-size:15px;line-height:1.6">
+    <h1 style="font-size:18px;margin:0 0 14px">${esc(titulo)}</h1>
+    ${corpoHtml}
+  </div>
+  <div style="text-align:center;font-size:12px;color:#7a756c;line-height:1.6;padding:18px 8px 0">
+    Kosen Sneakers · CNPJ 66.966.835/0001-09<br>
+    WhatsApp (46) 99936-8728 · <a href="mailto:usekosen@gmail.com" style="color:#7a756c">usekosen@gmail.com</a><br>
+    <a href="https://usekosen.com.br" style="color:#7a756c">usekosen.com.br</a>
+  </div>
+</div></body></html>`;
+}
+
 export function resumoTexto(p) {
   const itens = (p.itens || []).map(i => `• ${i.q}x ${i.nome} — Nº ${i.t} — ${brl(i.unit * i.q)}`).join("\n");
   const c = p.cliente || {};
@@ -26,7 +45,7 @@ export async function enviarEmail({ para, assunto, texto, html }) {
   try {
     const nodemailer = (await import("nodemailer")).default;
     const t = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
-    await t.sendMail({ from: `"Kosen Sneakers" <${user}>`, to: para, subject: assunto, text: texto, html });
+    await t.sendMail({ from: `"Kosen Sneakers" <${user}>`, replyTo: user, to: para, subject: assunto, text: texto, html });
     return true;
   } catch (e) {
     console.error("E-mail falhou:", e.message);
@@ -57,8 +76,8 @@ export async function avisarVendaPaga(p) {
     enviarEmail({
       para: p.cliente?.email,
       assunto: `Kosen Sneakers — pedido ${p.id} confirmado`,
-      texto: `Oi, ${(p.cliente?.nome || "").split(" ")[0]}! Recebemos o pagamento do seu pedido ${p.id}.\n\n${(p.itens || []).map(i => `• ${i.q}x ${i.nome} — Nº ${i.t}`).join("\n")}\n\nTotal: ${brl(p.total)}\n\nAssim que for postado, mandamos o código de rastreio. Qualquer dúvida, é só responder este e-mail.\n\nKosen Sneakers`,
-      html: `<p>Oi, ${esc((p.cliente?.nome || "").split(" ")[0])}! Recebemos o pagamento do seu pedido <b>${esc(p.id)}</b>.</p><ul>${(p.itens || []).map(i => `<li>${i.q}x ${esc(i.nome)} — Nº ${i.t}</li>`).join("")}</ul><p>Total: <b>${brl(p.total)}</b></p><p>Assim que for postado, mandamos o código de rastreio. Qualquer dúvida, é só responder este e-mail.</p><p>Kosen Sneakers</p>`,
+      texto: `Oi, ${(p.cliente?.nome || "").split(" ")[0]}! Recebemos o pagamento do seu pedido ${p.id}.\n\n${(p.itens || []).map(i => `• ${i.q}x ${i.nome} — Nº ${i.t}`).join("\n")}\n\nTotal: ${brl(p.total)}\n\nAssim que for postado, mandamos o código de rastreio. Qualquer dúvida, é só responder este e-mail.\n\n${RODAPE_TEXTO}`,
+      html: modeloEmail("Pagamento confirmado", `<p>Oi, ${esc((p.cliente?.nome || "").split(" ")[0])}! Recebemos o pagamento do seu pedido <b>${esc(p.id)}</b>. Obrigada por comprar com a gente!</p><ul>${(p.itens || []).map(i => `<li>${i.q}x ${esc(i.nome)} — Nº ${i.t}</li>`).join("")}</ul><p>Total: <b>${brl(p.total)}</b></p><p>Assim que o pedido for postado, mandamos o código de rastreio por aqui. Você também acompanha tudo em <b>Minha conta → Meus pedidos</b> no site.</p><p>Qualquer dúvida, é só responder este e-mail ou chamar no WhatsApp.</p>`),
     }),
   ]);
 }
@@ -69,6 +88,7 @@ export async function avisarEnvio(p) {
   await enviarEmail({
     para: p.cliente?.email,
     assunto: `Kosen Sneakers — seu pedido ${p.id} foi enviado`,
-    texto: `Oi, ${nome}! Seu pedido ${p.id} foi postado.\nCódigo de rastreio: ${p.rastreio}\nPara acompanhar, cole o código em https://www.melhorrastreio.com.br\n\nKosen Sneakers`,
+    texto: `Oi, ${nome}! Seu pedido ${p.id} foi postado.\nCódigo de rastreio: ${p.rastreio}\nPara acompanhar, cole o código em https://www.melhorrastreio.com.br\n\n${RODAPE_TEXTO}`,
+    html: modeloEmail("Seu pedido foi enviado", `<p>Oi, ${esc(nome)}! Seu pedido <b>${esc(p.id)}</b> foi postado.</p><p>Código de rastreio:<br><b style="font-size:20px;letter-spacing:1px">${esc(p.rastreio)}</b></p><p>Para acompanhar, cole o código em <a href="https://www.melhorrastreio.com.br">melhorrastreio.com.br</a>. Você também vê o rastreio em <b>Minha conta → Meus pedidos</b> no site.</p><p>Qualquer dúvida, é só responder este e-mail ou chamar no WhatsApp.</p>`),
   });
 }
