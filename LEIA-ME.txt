@@ -1,20 +1,31 @@
-KOSEN SNEAKERS — SITE COM CHECKOUT MERCADO PAGO + FRETE MELHOR ENVIO
+KOSEN SNEAKERS — SITE + CHECKOUT MERCADO PAGO + FRETE MELHOR ENVIO + PAINEL DE PEDIDOS
 
-Pastas:
-  site/                     -> o site (index.html + catalogo.js)
-  site/catalogo.js          -> PREÇOS, produtos, estoque, parcelas e FRETE. Edite aqui.
-  netlify/functions/        -> checkout e cotação de frete (rodam no servidor)
-  netlify/lib/frete.mjs     -> ligação com o Melhor Envio
-  netlify.toml              -> configuração do Netlify (não mexer)
+PASTAS
+  site/                 -> o site (index.html, catalogo.js, admin.html, fotos/)
+  site/catalogo.js      -> PREÇOS, produtos, numeração, contato. Edite aqui.
+  site/admin.html       -> painel de pedidos (usekosen.com.br/admin)
+  Ícone da pessoinha    -> área do cliente: cadastro com código no e-mail, login, meus pedidos, meus dados
+  netlify/functions/    -> checkout, frete, webhook do Mercado Pago, status do pedido, painel
+  netlify/lib/          -> pedidos (banco), pagamento, avisos (e-mail/WhatsApp), frete
+  netlify.toml          -> configuração e cabeçalhos de segurança (não mexer)
+  package.json          -> bibliotecas que o Netlify instala sozinho (não mexer)
 
-FRETE: em site/catalogo.js preencha  cepOrigem: "00000-000"  com o CEP
-de onde o fornecedor despacha. Enquanto estiver vazio, o site usa a
-estimativa fixa (PAC/SEDEX por região).
+CHAVES — Netlify > kosen-checkout > Project configuration > Environment variables
+  MP_ACCESS_TOKEN      Access Token de PRODUÇÃO do Mercado Pago
+  MP_WEBHOOK_SECRET    Assinatura secreta do Webhook (painel do Mercado Pago > Webhooks)
+  MELHOR_ENVIO_TOKEN   Token de API do Melhor Envio
+  ADMIN_PASSWORD       Senha do painel /admin (mínimo 10 caracteres)
+  GMAIL_USER           usekosen@gmail.com
+  GMAIL_APP_PASSWORD   Senha de app do Google (16 letras)
+  AVISO_EMAIL          (opcional) e-mail que recebe os avisos de venda; vazio = GMAIL_USER
+  CALLMEBOT_PHONE      5546999368728
+  CALLMEBOT_APIKEY     chave que o CallMeBot manda no WhatsApp
+  SESSION_SECRET       (recomendado) texto longo aleatório que protege o login das clientes
+Nunca coloque chaves dentro dos arquivos do site. Depois de mudar uma chave:
+Deploys > Trigger deploy > Deploy project.
 
-Chaves obrigatórias no Netlify (Keys and secrets):
-  MP_ACCESS_TOKEN      = Access Token do Mercado Pago
-  MELHOR_ENVIO_TOKEN   = token de API do Melhor Envio
-Nunca coloque tokens dentro dos arquivos do site.
+WEBHOOK DO MERCADO PAGO (obrigatório para o site saber que a venda foi paga)
+  URL: https://usekosen.com.br/api/mp-webhook     Evento: Pagamentos
 
-Item de teste de R$ 10: abra o site com /?teste no fim do endereço.
-
+ITEM DE TESTE de R$ 10: abra o site com /?teste no fim do endereço.
+Ao mudar o catalogo.js, troque o v= no fim do index.html (ex.: v=2026-11-28a).

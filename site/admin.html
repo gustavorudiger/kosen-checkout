@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel · Kosen Sneakers</title>
+<style>
+  :root{--ink:#191919;--paper:#f7f5f0;--line:#e2ddd2;--mute:#76716a;--ok:#3f6b4e;--sale:#b4523b;--cream:#e8e4db}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink);font-size:14px}
+  button,input,select,textarea{font:inherit}
+  header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--ink);color:var(--cream);position:sticky;top:0;z-index:5}
+  header b{font-size:18px}
+  main{max-width:1100px;margin:0 auto;padding:20px}
+  .login{max-width:340px;margin:12vh auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px}
+  .login h1{font-size:20px;margin-bottom:14px}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+  .btn{background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+  .btn.sm{padding:6px 12px;font-size:13px}
+  .msg{color:var(--sale);font-weight:600;margin-top:10px;min-height:18px}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:600}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .resumo div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .resumo b{display:block;font-size:20px}
+  .ped{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+  .ped summary{display:grid;grid-template-columns:150px 1fr 120px 130px;gap:10px;padding:14px 16px;cursor:pointer;align-items:center;list-style:none}
+  .ped summary::-webkit-details-marker{display:none}
+  .st{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--cream);text-align:center}
+  .st.pago,.st.separando{background:#dcefe2;color:var(--ok)}
+  .st.enviado,.st.entregue{background:#dfe8f5;color:#2a4f86}
+  .st.cancelado,.st.recusado{background:#f6e1dc;color:var(--sale)}
+  .corpo{border-top:1px solid var(--line);padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .corpo h4{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+  .corpo p,.corpo li{line-height:1.55}
+  .corpo ul{padding-left:18px}
+  .acoes{display:grid;gap:8px}
+  .linha{display:flex;gap:8px;flex-wrap:wrap}
+  .mute{color:var(--mute);font-size:12px}
+  @media (max-width:760px){.ped summary{grid-template-columns:1fr 1fr}.corpo{grid-template-columns:1fr}.resumo{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const brl = v => Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const data = s => s ? new Date(s).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}) : "";
+let token = sessionStorage.getItem("ks_admin") || "";
+let pedidos = [], STATUS = {}, filtro = "ativos";
+
+async function api(acao, extra = {}) {
+  const r = await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+    body: JSON.stringify({ acao, ...extra }) });
+  const j = await r.json().catch(() => ({ erro: "Erro de conexão" }));
+  if (r.status === 401 && acao !== "login") { sair(); throw new Error(j.erro); }
+  if (!r.ok) throw new Error(j.erro || "Erro");
+  return j;
+}
+
+function telaLogin(msg = "") {
+  $("#app").innerHTML = `<form class="login" id="fLogin"><h1>Painel Kosen</h1>
+    <input type="password" id="senha" placeholder="Senha" autocomplete="current-password" required>
+    <button class="btn" style="width:100%;margin-top:12px">Entrar</button><div class="msg">${esc(msg)}</div></form>`;
+  $("#senha").focus();
+  $("#fLogin").onsubmit = async e => {
+    e.preventDefault();
+    try { const j = await api("login", { senha: $("#senha").value }); token = j.token; sessionStorage.setItem("ks_admin", token); carregar(); }
+    catch (er) { telaLogin(er.message); }
+  };
+}
+function sair() { token = ""; sessionStorage.removeItem("ks_admin"); telaLogin(); }
+
+async function carregar() {
+  $("#app").innerHTML = `<header><b>Kosen · Pedidos</b><div class="linha"><button class="btn sm ghost" id="bAtual">Atualizar</button><button class="btn sm ghost" id="bSair">Sair</button></div></header><main id="main"><p class="mute">Carregando…</p></main>`;
+  $("#bSair").onclick = sair; $("#bAtual").onclick = carregar;
+  try { const j = await api("listar"); pedidos = j.pedidos; STATUS = j.status; render(); }
+  catch (e) { $("#main").innerHTML = `<p class="msg">${esc(e.message)}</p>`; }
+}
+
+function render() {
+  const ativos = p => ["pago", "separando", "enviado"].includes(p.status);
+  const lista = pedidos.filter(p => filtro === "todos" ? true : filtro === "ativos" ? ativos(p) : p.status === filtro);
+  const pagos = pedidos.filter(p => ["pago","separando","enviado","entregue"].includes(p.status));
+  const fil = [["ativos","Para enviar / em trânsito"],["aguardando","Aguardando pagamento"],["pago","Pagos"],["enviado","Enviados"],["entregue","Entregues"],["cancelado","Cancelados"],["todos","Todos"]];
+  $("#main").innerHTML = `
+    <div class="resumo">
+      <div><span class="mute">Para separar</span><b>${pedidos.filter(p=>p.status==="pago").length}</b></div>
+      <div><span class="mute">Em trânsito</span><b>${pedidos.filter(p=>p.status==="enviado").length}</b></div>
+      <div><span class="mute">Vendas pagas</span><b>${pagos.length}</b></div>
+      <div><span class="mute">Faturado</span><b>${brl(pagos.reduce((s,p)=>s+Number(p.total||0),0))}</b></div>
+    </div>
+    <div class="bar">${fil.map(([k,n])=>`<button class="chip ${filtro===k?"on":""}" data-f="${k}">${n}</button>`).join("")}</div>
+    ${lista.length ? lista.map(card).join("") : `<p class="mute">Nenhum pedido aqui.</p>`}`;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { filtro = b.dataset.f; render(); });
+  document.querySelectorAll("form[data-id]").forEach(f => f.onsubmit = salvar);
+  document.querySelectorAll("[data-sync]").forEach(b => b.onclick = () => sincronizar(b.dataset.sync, b));
+  document.querySelectorAll("[data-copia]").forEach(b => b.onclick = () => { navigator.clipboard.writeText(b.dataset.copia); b.textContent = "Copiado ✓"; });
+}
+
+function card(p) {
+  const c = p.cliente || {};
+  const end = `${c.nome}\n${c.rua}, ${c.numero} ${c.comp||""}\n${c.bairro} — ${c.cidade}/${c.uf}\nCEP ${c.cep}`;
+  const fone = String(c.fone||"").replace(/\D/g,"");
+  return `<details class="ped"><summary>
+      <span><b>${esc(p.id)}</b><br><span class="mute">${data(p.criadoEm)}</span></span>
+      <span>${esc(c.nome)}<br><span class="mute">${(p.itens||[]).map(i=>`${i.q}x ${esc(i.nome)} nº ${i.t}`).join(" · ")}</span></span>
+      <span><b>${brl(p.total)}</b><br><span class="mute">${p.metodo==="pix"?"PIX":"Cartão"}</span></span>
+      <span class="st ${esc(p.status)}">${esc(STATUS[p.status]||p.status)}</span>
+    </summary>
+    <div class="corpo">
+      <div>
+        <h4>Itens</h4><ul>${(p.itens||[]).map(i=>`<li>${i.q}x ${esc(i.nome)} — Nº ${i.t} — ${brl(i.unit*i.q)}</li>`).join("")}</ul>
+        <p class="mute">Frete: ${esc(p.frete ? `${p.frete.nome} ${p.frete.prazo||""}` : "-")}</p>
+        <h4 style="margin-top:12px">Entrega</h4><p style="white-space:pre-line">${esc(end)}</p>
+        <div class="linha" style="margin-top:8px"><button type="button" class="btn sm ghost" data-copia="${esc(end)}">Copiar endereço</button>
+          <a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/55${esc(fone.replace(/^55/,""))}">WhatsApp da cliente</a></div>
+        <p class="mute" style="margin-top:8px">${esc(c.email)} · ${esc(c.fone)}</p>
+        <h4 style="margin-top:12px">Pagamento</h4>
+        <p class="mute">${p.pagamento ? `MP #${esc(p.pagamento.id)} · ${esc(p.pagamento.status)} · ${brl(p.pagamento.valor)} · ${esc(p.pagamento.metodo||"")} ${p.pagamento.parcelas>1?p.pagamento.parcelas+"x":""}` : "Sem confirmação do Mercado Pago ainda."}</p>
+        <button type="button" class="btn sm ghost" data-sync="${esc(p.id)}" style="margin-top:6px">Consultar Mercado Pago</button>
+      </div>
+      <form class="acoes" data-id="${esc(p.id)}">
+        <h4>Atualizar</h4>
+        <select name="status">${Object.entries(STATUS).map(([k,n])=>`<option value="${k}" ${k===p.status?"selected":""}>${esc(n)}</option>`).join("")}</select>
+        <input name="rastreio" placeholder="Código de rastreio" value="${esc(p.rastreio||"")}">
+        <textarea name="nota" rows="3" placeholder="Anotações internas">${esc(p.nota||"")}</textarea>
+        <button class="btn">Salvar</button>
+        <p class="mute">Ao salvar como <b>Enviado</b> com código de rastreio, a cliente recebe o código por e-mail.</p>
+        <div class="msg"></div>
+        <p class="mute">${(p.historico||[]).map(h=>`${esc(STATUS[h.status]||h.status)} ${data(h.em)}`).join(" → ")}</p>
+      </form>
+    </div></details>`;
+}
+
+async function salvar(e) {
+  e.preventDefault();
+  const f = e.target, msg = f.querySelector(".msg");
+  msg.style.color = ""; msg.textContent = "Salvando…";
+  try {
+    const j = await api("atualizar", { id: f.dataset.id, status: f.status.value, rastreio: f.rastreio.value, nota: f.nota.value });
+    pedidos = pedidos.map(p => p.id === j.pedido.id ? j.pedido : p);
+    msg.style.color = "var(--ok)"; msg.textContent = j.emailRastreio ? "Salvo ✓ — rastreio enviado à cliente" : "Salvo ✓";
+    setTimeout(render, 900);
+  } catch (er) { msg.textContent = er.message; }
+}
+async function sincronizar(id, b) {
+  b.textContent = "Consultando…";
+  try { const j = await api("sincronizar", { id }); pedidos = pedidos.map(p => p.id === id ? j.pedido : p); render(); }
+  catch (er) { b.textContent = er.message; }
+}
+
+token ? carregar() : telaLogin();
+</script>
+</body>
+</html>

@@ -168,6 +168,55 @@
   .pol details{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px}
   .pol summary{font-weight:700;font-size:16px;cursor:pointer}
   .pol p{margin-top:10px;line-height:1.6;font-size:14.5px;color:#4d4943}
+
+  /* Visualizador de fotos */
+  .card .img .ph{cursor:zoom-in}
+  .zoom-hint{position:absolute;top:54px;right:10px;z-index:2;background:rgba(255,255,255,.9);border-radius:999px;padding:4px 9px;font-size:11px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none}
+  .card:hover .zoom-hint{opacity:1}
+  .zv{position:fixed;inset:0;z-index:130;background:rgba(12,12,12,.97);display:none;flex-direction:column}
+  .zv.show{display:flex}
+  .zv-top{display:flex;justify-content:space-between;align-items:center;color:#fff;padding:12px 16px;gap:10px}
+  .zv-top b{font-size:15px;font-weight:600}
+  .zv-btn{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:20px;display:grid;place-items:center;flex:none}
+  .zv-btn:hover{background:rgba(255,255,255,.26)}
+  .zv-stage{flex:1;position:relative;overflow:hidden;touch-action:none;cursor:zoom-in}
+  .zv-stage.z{cursor:grab}.zv-stage.z.drag{cursor:grabbing}
+  .zv-stage img{position:absolute;left:50%;top:50%;max-width:94%;max-height:94%;transform-origin:center;user-select:none;-webkit-user-drag:none;transition:transform .15s}
+  .zv-stage.drag img{transition:none}
+  .zv-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2}
+  .zv-prev{left:12px}.zv-next{right:12px}
+  .zv-thumbs{display:flex;gap:6px;justify-content:center;padding:10px;overflow-x:auto}
+  .zv-thumbs button{width:56px;height:56px;border-radius:8px;overflow:hidden;border:2px solid transparent;flex:none;opacity:.6}
+  .zv-thumbs button.on{border-color:#fff;opacity:1}
+  .zv-thumbs img{width:100%;height:100%;object-fit:cover}
+  .zv-help{color:#bbb;font-size:12px;text-align:center;padding-bottom:10px}
+  /* Minha conta */
+  .dot-on{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--ok);display:none}
+  .conta .cbody{flex:1;overflow-y:auto;padding:18px 22px}
+  .ctabs{display:flex;gap:4px;background:var(--soft);padding:4px;border-radius:999px;margin-bottom:16px}
+  .ctabs button{flex:1;padding:9px;border-radius:999px;font-weight:600;font-size:13px;color:var(--mute)}
+  .ctabs button.on{background:var(--ink);color:var(--cream)}
+  .cform{display:grid;gap:10px}
+  .cform label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--mute)}
+  .cform input{height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:15px;color:var(--ink);background:#fff;width:100%}
+  .cform .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cbtn{height:48px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:700;font-size:15px;width:100%}
+  .cbtn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--ink)}
+  .clink{font-size:13px;text-decoration:underline;color:var(--mute);text-align:center}
+  .cmsg{font-size:13px;font-weight:600;min-height:18px;color:#c0392b}
+  .cmsg.ok{color:var(--ok)}
+  .cped{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .cped .topo{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .cped .st{font-size:11px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--cream);white-space:nowrap}
+  .cped .st.pago,.cped .st.separando{background:#dcefe2;color:var(--ok)}
+  .cped .st.enviado,.cped .st.entregue{background:#dfe8f5;color:#2a4f86}
+  .cped .st.cancelado,.cped .st.recusado{background:#f6e1dc;color:var(--sale)}
+  .cped small{color:var(--mute);font-size:12px;display:block;line-height:1.5}
+  .cped ul{margin:8px 0 6px 18px;font-size:13px;line-height:1.5}
+  .trilha{display:flex;gap:4px;margin:10px 0 4px}
+  .trilha i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+  .trilha i.on{background:var(--ok)}
+  .rastreio{margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:10px;font-size:13px}
   /* Rodapé */
   footer{margin-top:80px;background:var(--ink);color:var(--cream);padding:60px 0 30px;font-size:14px}
   .foot{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.2fr;gap:40px}
@@ -300,6 +349,10 @@
     <div class="icons">
       <button class="icon-btn" aria-label="Buscar" onclick="location.hash='produtos';setTimeout(()=>document.getElementById('busca').focus(),300)">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Minha conta" onclick="abrirConta()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10" cy="7" r="4"/><path d="M3 18c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>
+        <span class="dot-on" id="contaDot"></span>
       </button>
       <button class="icon-btn" aria-label="Carrinho" onclick="openCart()">
         <svg width="21" height="21" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h13l-1 11H5z"/><path d="M7.5 7V5.5a3 3 0 0 1 6 0V7"/></svg>
@@ -534,6 +587,29 @@
 </aside>
 
 <div class="toast" id="toast"></div>
+
+<!-- VISUALIZADOR DE FOTOS -->
+<div class="zv" id="zv" aria-modal="true" role="dialog">
+  <div class="zv-top"><b id="zvTit"></b>
+    <div style="display:flex;gap:8px">
+      <button class="zv-btn" onclick="zvZoom(-1)" aria-label="Diminuir">−</button>
+      <button class="zv-btn" onclick="zvZoom(1)" aria-label="Aumentar">+</button>
+      <button class="zv-btn" onclick="fecharZoom()" aria-label="Fechar">✕</button>
+    </div></div>
+  <div class="zv-stage" id="zvStage">
+    <button class="zv-btn zv-nav zv-prev" onclick="zvIr(-1)" aria-label="Foto anterior">‹</button>
+    <img id="zvImg" alt="">
+    <button class="zv-btn zv-nav zv-next" onclick="zvIr(1)" aria-label="Próxima foto">›</button>
+  </div>
+  <div class="zv-thumbs" id="zvThumbs"></div>
+  <div class="zv-help">Clique (ou toque duas vezes) para dar zoom · arraste para ver os detalhes · roda do mouse ou pinça também funcionam</div>
+</div>
+
+<!-- MINHA CONTA -->
+<aside class="drawer conta" id="conta">
+  <div class="drawer-h"><h3>Minha conta</h3><button class="icon-btn" onclick="fecharConta()">✕</button></div>
+  <div class="cbody" id="contaBody"></div>
+</aside>
 <div class="cookie" id="cookie">Ao continuar navegando, você concorda com o uso de cookies para melhorar sua experiência.<button onclick="this.parentElement.remove()">Entendi</button></div>
 <a class="wa-float wa-link" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
   <svg width="30" height="30" viewBox="0 0 18 18" fill="#fff"><path d="M9 1a8 8 0 0 0-6.9 12L1 17l4.1-1.1A8 8 0 1 0 9 1zm4.3 11.2c-.2.5-1 1-1.5 1-.4.1-.9.1-2.9-.7-2.4-1-3.9-3.4-4-3.6-.1-.2-1-1.3-1-2.4s.6-1.7.8-1.9c.2-.2.4-.3.6-.3h.4c.1 0 .3 0 .5.4l.7 1.6c.1.1.1.3 0 .4l-.3.4-.3.4c-.1.1-.2.3 0 .5.1.3.6 1 1.3 1.6.9.8 1.6 1 1.9 1.1.2.1.4.1.5-.1l.7-.9c.2-.2.3-.2.5-.1l1.6.8c.2.1.4.2.4.3.1.1.1.6-.1 1.1z"/></svg>
@@ -660,7 +736,7 @@ function card(p){
       <button class="fav ${fav?'on':''}" onclick="toggleFav(${p.id})" aria-label="Favoritar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/></svg></button>
       ${allOut?'<div class="sold">ESGOTADO</div>':''}
       <span class="gtag">${p.g==="F"?"FEMININO":p.g==="M"?"MASCULINO":"UNISSEX"} · ${p.estilo.toUpperCase()}</span>
-      <div class="ph">${media(p)}</div>${p.imgs?.length>1?`<div style="position:absolute;bottom:28px;left:8px;right:8px;display:flex;gap:4px;z-index:3;justify-content:center">${p.imgs.map(src=>`<button aria-label="Ver foto" style="width:34px;height:34px;border:1px solid white;border-radius:5px;overflow:hidden" onclick="this.closest('.img').querySelector('.ph img').src='${src}'"><img src="${src}" loading="lazy" style="width:100%;height:100%;object-fit:cover"></button>`).join('')}</div>`:''}
+      <div class="ph" role="button" aria-label="Ampliar foto" onclick="abrirZoom(${p.id},this)">${media(p)}</div><span class="zoom-hint">⤢ ampliar</span>${p.imgs?.length>1?`<div style="position:absolute;bottom:28px;left:8px;right:8px;display:flex;gap:4px;z-index:3;justify-content:center">${p.imgs.map(src=>`<button aria-label="Ver foto" style="width:34px;height:34px;border:1px solid white;border-radius:5px;overflow:hidden" onclick="event.stopPropagation();this.closest('.img').querySelector('.ph img').src='${src}'"><img src="${src}" loading="lazy" style="width:100%;height:100%;object-fit:cover"></button>`).join('')}</div>`:''}
     </div>
     <h3>${p.nome}</h3>
     <div class="price">
@@ -783,7 +859,7 @@ function renderShip(T){
 function abrePol(id){ const d=$(id); if(d) d.open=true; }
 function openCart(){ $("drawer").classList.add("show"); $("overlay").classList.add("show"); }
 function toggleMenu(v){ $("mnav").classList.toggle("show",v); $("overlay").classList.toggle("show",v); }
-function closeAll(){ ["drawer","mnav","overlay"].forEach(i=>$(i).classList.remove("show")); }
+function closeAll(){ ["drawer","mnav","overlay","conta"].forEach(i=>$(i).classList.remove("show")); }
 let tt; function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2200); }
 
 /* ============================================================
@@ -792,7 +868,7 @@ let tt; function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add(
 const F = id => $(id).value.trim();
 function abrirCheckout(){
   if(!cart.length) return;
-  const d = load("ks_cliente",{});
+  const d = Object.assign({}, load("ks_cliente",{}), contaPreenche());
   [["fNome","nome"],["fEmail","email"],["fFone","fone"],["fCep","cep"],["fNum","numero"],["fRua","rua"],["fComp","comp"],["fBairro","bairro"],["fCidade","cidade"],["fUf","uf"]]
     .forEach(([i,k])=>{ if(!$(i).value && d[k]) $(i).value=d[k]; });
   if(!$("fCep").value && ship) $("fCep").value = ship.cep;
@@ -827,39 +903,241 @@ async function pagar(metodo){
       body:JSON.stringify({metodo,frete:ship?ship.id:"",cliente:cli,itens:cart.map(i=>({id:i.id,t:i.t,q:i.q}))})});
     const j = await r.json();
     if(!r.ok||!j.url) throw new Error(j.erro||"Erro ao abrir o pagamento");
-    save("ks_ultimo",{pedido:j.pedido,itens:cart,cli,metodo,total:j.total,frete:ship});
     location.href = j.url;
   }catch(e){
     $("ckMsg").style.color=""; $("ckMsg").textContent = e.message+" Se preferir, finalize pelo WhatsApp.";
     bts.forEach(b=>b.disabled=false);
   }
 }
-function retornoPagamento(){
-  const q = new URLSearchParams(location.search), st = q.get("pagamento");
-  if(!st) return;
-  const u = load("ks_ultimo",null);
-  const txt = {aprovado:["Pagamento aprovado! ✦","Recebemos seu pedido e já vamos separar seus tênis. Você recebe a confirmação por e-mail."],
-    pendente:["Pagamento em análise","Assim que o Mercado Pago confirmar, seu pedido segue para separação."],
-    recusado:["Pagamento não concluído","Nada foi cobrado. Você pode tentar de novo pela sacola ou falar com a gente no WhatsApp."]}[st];
-  if(!txt) return;
-  if(st==="aprovado"){ cart=[]; save("ks_cart",cart); renderCart(); }
-  let wa="";
-  if(u && st!=="recusado"){
-    const l = u.itens.map(i=>{const p=PRODUTOS.find(x=>x.id===i.id);return p?`• ${i.q}x ${p.nome} — Nº ${i.t}`:""}).join("\n");
-    const m = `Olá! Fiz o pedido ${u.pedido} no site (${st==="aprovado"?"pago":"pagamento pendente"} via ${u.metodo==="pix"?"PIX":"cartão"}):\n\n${l}\n\nTotal: ${brl(u.total)}\nEntrega: ${u.cli.nome} — ${u.cli.rua}, ${u.cli.numero} ${u.cli.comp||""} — ${u.cli.bairro} — ${u.cli.cidade}/${u.cli.uf} — CEP ${u.cli.cep}`;
-    wa = `<p style="font-size:14px">Pedido <b>${u.pedido}</b></p><a href="https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(m)}" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:600">Enviar comprovante no WhatsApp</a>`;
-  }
-  const d=document.createElement("div"); d.className="paid";
-  d.innerHTML=`<div><h3>${txt[0]}</h3><p style="color:var(--mute)">${txt[1]}</p>${wa}<br><button onclick="this.closest('.paid').remove()">Continuar</button></div>`;
-  document.body.appendChild(d);
+async function retornoPagamento(){
+  const q = new URLSearchParams(location.search), id = q.get("pedido");
+  if(!id || !/^KS[A-Z0-9]{6,30}$/.test(id)) return;
   history.replaceState(null,"",location.pathname);
+  const d=document.createElement("div"); d.className="paid";
+  d.innerHTML=`<div><h3>Conferindo seu pagamento…</h3><p style="color:var(--mute)">Só um instante.</p></div>`;
+  document.body.appendChild(d);
+  let info=null;
+  for(let k=0;k<4 && (!info || info.status==="aguardando");k++){
+    try{ const r=await fetch("/api/pedido?id="+encodeURIComponent(id),{cache:"no-store"}); if(r.ok) info=await r.json(); }catch(e){}
+    if(!info || info.status==="aguardando") await new Promise(r=>setTimeout(r,2500));
+  }
+  const st = info ? info.status : "aguardando";
+  const txt = {pago:["Pagamento aprovado! ✦","Recebemos seu pedido e já vamos separar seus tênis. A confirmação chega no seu e-mail."],
+    separando:["Pedido confirmado ✦","Seu pedido já está sendo separado."],
+    enviado:["Pedido enviado ✦","Seu pedido já foi postado."+(info&&info.rastreio?` Rastreio: ${info.rastreio}`:"")],
+    entregue:["Pedido entregue ✦","Obrigada por comprar com a Kosen!"],
+    recusado:["Pagamento não concluído","Nada foi cobrado. Você pode tentar de novo pela sacola ou falar com a gente no WhatsApp."],
+    cancelado:["Pagamento não concluído","Nada foi cobrado. Você pode tentar de novo pela sacola ou falar com a gente no WhatsApp."],
+    aguardando:["Pagamento em análise","Assim que o Mercado Pago confirmar, você recebe um e-mail e o pedido segue para separação. Se pagou por PIX, pode levar alguns minutos."]}[st] || ["Pedido recebido",""];
+  if(["pago","separando","enviado","entregue","aguardando"].includes(st)){ cart=[]; save("ks_cart",cart); renderCart(); }
+  const m = `Olá! Tenho uma dúvida sobre o pedido ${id} do site.`;
+  d.innerHTML=`<div><h3>${txt[0]}</h3><p style="color:var(--mute)">${txt[1]}</p><p style="font-size:14px;margin-top:10px">Pedido <b>${id}</b></p><a href="https://wa.me/${LOJA.whatsapp}?text=${encodeURIComponent(m)}" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:600">Falar com a gente no WhatsApp</a><br><button onclick="this.closest('.paid').remove()">Continuar</button></div>`;
+}
+
+/* ============================================================
+   Visualizador de fotos com zoom
+   ============================================================ */
+const zv = { fotos:[], i:0, s:1, x:0, y:0, nome:"" };
+function abrirZoom(id, el){
+  const p = PRODUTOS.find(x=>x.id===id); if(!p) return;
+  zv.fotos = (p.imgs && p.imgs.length ? p.imgs : (p.img ? [p.img] : []));
+  if(!zv.fotos.length) return;
+  const atual = el && el.querySelector("img") ? el.querySelector("img").getAttribute("src") : zv.fotos[0];
+  zv.i = Math.max(0, zv.fotos.indexOf(atual)); zv.nome = p.nome;
+  $("zvTit").textContent = p.nome;
+  $("zvThumbs").innerHTML = zv.fotos.length>1 ? zv.fotos.map((f,k)=>`<button onclick="zvMostra(${k})" aria-label="Foto ${k+1}"><img src="${f}" alt=""></button>`).join("") : "";
+  document.querySelectorAll(".zv-nav").forEach(b=>b.style.display = zv.fotos.length>1 ? "" : "none");
+  $("zv").classList.add("show"); document.body.style.overflow="hidden";
+  zvMostra(zv.i);
+}
+function fecharZoom(){ $("zv").classList.remove("show"); document.body.style.overflow=""; }
+function zvMostra(k){
+  zv.i = (k + zv.fotos.length) % zv.fotos.length; zv.s=1; zv.x=0; zv.y=0;
+  $("zvImg").src = zv.fotos[zv.i]; $("zvImg").alt = zv.nome;
+  document.querySelectorAll("#zvThumbs button").forEach((b,j)=>b.classList.toggle("on", j===zv.i));
+  zvAplica();
+}
+function zvIr(d){ zvMostra(zv.i + d); }
+function zvLimita(){
+  const st=$("zvStage").getBoundingClientRect(), im=$("zvImg");
+  const w=im.offsetWidth*zv.s, h=im.offsetHeight*zv.s;
+  const mx=Math.max(0,(w-st.width)/2), my=Math.max(0,(h-st.height)/2);
+  zv.x=Math.min(mx,Math.max(-mx,zv.x)); zv.y=Math.min(my,Math.max(-my,zv.y));
+}
+function zvAplica(){
+  if(zv.s<=1){ zv.s=1; zv.x=0; zv.y=0; } else zvLimita();
+  $("zvImg").style.transform = `translate(calc(-50% + ${zv.x}px), calc(-50% + ${zv.y}px)) scale(${zv.s})`;
+  $("zvStage").classList.toggle("z", zv.s>1);
+}
+function zvZoom(d, cx, cy){
+  const antes = zv.s;
+  zv.s = Math.min(5, Math.max(1, zv.s * (d>0 ? 1.5 : 1/1.5)));
+  if(cx!==undefined && zv.s>1){
+    const r=$("zvStage").getBoundingClientRect(), ox=cx-(r.left+r.width/2), oy=cy-(r.top+r.height/2), f=zv.s/antes;
+    zv.x = ox - (ox - zv.x)*f; zv.y = oy - (oy - zv.y)*f;
+  }
+  zvAplica();
+}
+(function(){
+  const st = () => $("zvStage");
+  let arr=null, moveu=false, toques={}, pinca=null, ultimoToque=0;
+  document.addEventListener("keydown", e=>{ if(!$("zv").classList.contains("show")) return;
+    if(e.key==="Escape") fecharZoom(); if(e.key==="ArrowRight") zvIr(1); if(e.key==="ArrowLeft") zvIr(-1); });
+  document.addEventListener("DOMContentLoaded", ()=>{}); 
+  window.addEventListener("load", ()=>{
+    const s = st(); if(!s) return;
+    s.addEventListener("wheel", e=>{ e.preventDefault(); zvZoom(e.deltaY<0?1:-1, e.clientX, e.clientY); }, {passive:false});
+    s.addEventListener("pointerdown", e=>{
+      if(e.target.closest(".zv-nav")) return;
+      toques[e.pointerId]={x:e.clientX,y:e.clientY}; s.setPointerCapture(e.pointerId);
+      const ids=Object.keys(toques);
+      if(ids.length===2){ const [a,b]=ids.map(i=>toques[i]); pinca={d:Math.hypot(a.x-b.x,a.y-b.y), s:zv.s}; arr=null; return; }
+      arr={x:e.clientX,y:e.clientY,ox:zv.x,oy:zv.y}; moveu=false;
+    });
+    s.addEventListener("pointermove", e=>{
+      if(!toques[e.pointerId]) return; toques[e.pointerId]={x:e.clientX,y:e.clientY};
+      const ids=Object.keys(toques);
+      if(pinca && ids.length===2){ const [a,b]=ids.map(i=>toques[i]); zv.s=Math.min(5,Math.max(1,pinca.s*Math.hypot(a.x-b.x,a.y-b.y)/pinca.d)); zvAplica(); return; }
+      if(!arr) return;
+      const dx=e.clientX-arr.x, dy=e.clientY-arr.y; if(Math.abs(dx)+Math.abs(dy)>4) moveu=true;
+      if(zv.s>1){ s.classList.add("drag"); zv.x=arr.ox+dx; zv.y=arr.oy+dy; zvAplica(); }
+    });
+    const fim = e=>{
+      delete toques[e.pointerId]; s.classList.remove("drag");
+      if(pinca){ if(Object.keys(toques).length<2) pinca=null; arr=null; return; }
+      if(!arr) return;
+      const dx=e.clientX-arr.x;
+      if(!moveu){
+        const agora=Date.now(), toque=e.pointerType!=="mouse";
+        if(!toque || agora-ultimoToque<300){ if(zv.s>1){ zv.s=1; zvAplica(); } else { zv.s=1; zvZoom(1,e.clientX,e.clientY); zvZoom(1,e.clientX,e.clientY); } ultimoToque=0; }
+        else ultimoToque=agora;
+      } else if(zv.s===1 && Math.abs(dx)>60 && zv.fotos.length>1) zvIr(dx<0?1:-1);
+      arr=null;
+    };
+    s.addEventListener("pointerup", fim); s.addEventListener("pointercancel", fim);
+  });
+})();
+
+/* ============================================================
+   Minha conta (cadastro, login, pedidos, dados)
+   ============================================================ */
+const escH = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let sessao = load("ks_sessao", null);
+const contaUI = { tela:"entrar", email:"", aba:"pedidos", dados:null };
+function contaPreenche(){
+  const c = sessao && sessao.conta; if(!c) return {};
+  const e = c.endereco || {};
+  return {nome:c.nome, email:c.email, fone:c.fone, cep:e.cep?String(e.cep).replace(/^(\d{5})(\d{3})$/,"$1-$2"):"", numero:e.numero, rua:e.rua, comp:e.comp, bairro:e.bairro, cidade:e.cidade, uf:e.uf};
+}
+function marcaConta(){ const d=$("contaDot"); if(d) d.style.display = sessao ? "block" : "none"; }
+async function apiConta(acao, extra={}){
+  const h={"Content-Type":"application/json"}; if(sessao) h.Authorization="Bearer "+sessao.token;
+  const r = await fetch("/api/conta",{method:"POST",headers:h,body:JSON.stringify({acao,...extra})});
+  const j = await r.json().catch(()=>({erro:"Erro de conexão. Tente de novo."}));
+  if(r.status===401 && sessao && !["entrar","confirmar","redefinir"].includes(acao)){ sairConta(true); }
+  if(!r.ok) throw new Error(j.erro||"Erro"); return j;
+}
+function abrirConta(){ closeAll(); $("conta").classList.add("show"); $("overlay").classList.add("show"); contaUI.tela = sessao ? "logada" : (contaUI.tela==="logada"?"entrar":contaUI.tela); telaConta(); }
+function fecharConta(){ $("conta").classList.remove("show"); $("overlay").classList.remove("show"); }
+function sairConta(expirou){ sessao=null; try{localStorage.removeItem("ks_sessao")}catch(e){} contaUI.tela="entrar"; marcaConta(); telaConta(expirou?"Sua sessão expirou. Entre de novo.":""); }
+function entrouConta(j){ sessao={token:j.token, conta:j.conta}; save("ks_sessao",sessao); contaUI.tela="logada"; contaUI.aba="pedidos"; marcaConta(); telaConta(); }
+
+function telaConta(aviso=""){
+  const b=$("contaBody"), t=contaUI.tela;
+  const tabs = `<div class="ctabs"><button class="${t==="entrar"?"on":""}" onclick="contaUI.tela='entrar';telaConta()">Entrar</button><button class="${t==="criar"?"on":""}" onclick="contaUI.tela='criar';telaConta()">Criar conta</button></div>`;
+  const msg = `<div class="cmsg${aviso&&aviso.startsWith("✓")?" ok":""}" id="cMsg">${escH(aviso)}</div>`;
+  if(t==="entrar") b.innerHTML = tabs+`<form class="cform" id="cF">
+      <p style="font-size:14px;color:var(--mute)">Acompanhe seus pedidos, o rastreio e salve seu endereço para comprar mais rápido.</p>
+      <label>E-mail<input name="email" type="email" autocomplete="email" required value="${escH(contaUI.email)}"></label>
+      <label>Senha<input name="senha" type="password" autocomplete="current-password" required></label>
+      ${msg}<button class="cbtn">Entrar</button>
+      <a href="#" class="clink" onclick="contaUI.tela='esqueci';telaConta();return false">Esqueci minha senha</a></form>`;
+  else if(t==="criar") b.innerHTML = tabs+`<form class="cform" id="cF">
+      <label>Nome completo<input name="nome" autocomplete="name" required></label>
+      <label>E-mail<input name="email" type="email" autocomplete="email" required value="${escH(contaUI.email)}"></label>
+      <label>Senha (mínimo 8 caracteres)<input name="senha" type="password" minlength="8" autocomplete="new-password" required></label>
+      <label>Repita a senha<input name="senha2" type="password" minlength="8" autocomplete="new-password" required></label>
+      ${msg}<button class="cbtn">Criar conta</button>
+      <p style="font-size:12px;color:var(--mute)">Vamos mandar um código para o seu e-mail para confirmar. Seus dados seguem a nossa <a href="#privacidade" onclick="fecharConta();abrePol('privacidade')" style="text-decoration:underline">política de privacidade</a>.</p></form>`;
+  else if(t==="confirmar"||t==="redefinir") b.innerHTML = `<form class="cform" id="cF">
+      <p style="font-size:14px">Enviamos um código de 6 números para <b>${escH(contaUI.email)}</b>. Confira também a caixa de spam.</p>
+      <label>Código<input name="codigo" inputmode="numeric" maxlength="6" autocomplete="one-time-code" required></label>
+      ${t==="redefinir"?`<label>Nova senha (mínimo 8 caracteres)<input name="senha" type="password" minlength="8" autocomplete="new-password" required></label>`:""}
+      ${msg}<button class="cbtn">${t==="redefinir"?"Salvar nova senha":"Confirmar"}</button>
+      <a href="#" class="clink" onclick="contaUI.tela='entrar';telaConta();return false">Voltar</a></form>`;
+  else if(t==="esqueci") b.innerHTML = `<form class="cform" id="cF">
+      <p style="font-size:14px">Informe o e-mail da sua conta. Vamos mandar um código para você criar uma nova senha.</p>
+      <label>E-mail<input name="email" type="email" autocomplete="email" required value="${escH(contaUI.email)}"></label>
+      ${msg}<button class="cbtn">Enviar código</button>
+      <a href="#" class="clink" onclick="contaUI.tela='entrar';telaConta();return false">Voltar</a></form>`;
+  else return telaLogada(aviso);
+  const f=$("cF"); f.onsubmit = e=>{ e.preventDefault(); enviarConta(f); };
+  const p=f.querySelector("input:not([value]),input[value='']"); if(p) setTimeout(()=>p.focus(),50);
+}
+async function enviarConta(f){
+  const v = Object.fromEntries(new FormData(f)), m=$("cMsg"), bt=f.querySelector(".cbtn"), t=contaUI.tela;
+  m.className="cmsg"; m.textContent=""; bt.disabled=true;
+  try{
+    if(t==="entrar"){ contaUI.email=v.email; entrouConta(await apiConta("entrar",{email:v.email,senha:v.senha})); return; }
+    if(t==="criar"){ if(v.senha!==v.senha2) throw new Error("As senhas não são iguais."); contaUI.email=v.email; await apiConta("cadastrar",{nome:v.nome,email:v.email,senha:v.senha}); contaUI.tela="confirmar"; telaConta(); return; }
+    if(t==="confirmar"){ entrouConta(await apiConta("confirmar",{email:contaUI.email,codigo:v.codigo})); toast("Conta criada! ✦"); return; }
+    if(t==="esqueci"){ contaUI.email=v.email; await apiConta("esqueci",{email:v.email}); contaUI.tela="redefinir"; telaConta(); return; }
+    if(t==="redefinir"){ entrouConta(await apiConta("redefinir",{email:contaUI.email,codigo:v.codigo,senha:v.senha})); toast("Senha alterada ✦"); return; }
+  }catch(e){ m.textContent=e.message; bt.disabled=false; }
+}
+const ETAPAS=["pago","separando","enviado","entregue"];
+async function telaLogada(aviso=""){
+  const b=$("contaBody"), c=sessao.conta;
+  b.innerHTML = `<p style="font-size:15px;margin-bottom:12px">Olá, <b>${escH((c.nome||"").split(" ")[0])}</b>!</p>
+    <div class="ctabs"><button class="${contaUI.aba==="pedidos"?"on":""}" onclick="contaUI.aba='pedidos';telaLogada()">Meus pedidos</button><button class="${contaUI.aba==="dados"?"on":""}" onclick="contaUI.aba='dados';telaLogada()">Meus dados</button></div>
+    <div id="cAba"><p class="muted">Carregando…</p></div>
+    <button class="cbtn ghost" style="margin-top:16px" onclick="sairConta()">Sair da conta</button>`;
+  try{
+    const j = await apiConta("eu"); sessao.conta=j.conta; save("ks_sessao",sessao); contaUI.dados=j;
+  }catch(e){ if(sessao) $("cAba").innerHTML=`<div class="cmsg">${escH(e.message)}</div>`; return; }
+  const a=$("cAba"); if(!a) return;
+  if(contaUI.aba==="pedidos"){
+    const ps=contaUI.dados.pedidos;
+    a.innerHTML = ps.length ? ps.map(p=>{
+      const n = ETAPAS.indexOf(p.status), e=p.entrega||{};
+      return `<div class="cped"><div class="topo"><div><b>${escH(p.id)}</b><small>${new Date(p.criadoEm).toLocaleDateString("pt-BR")} · ${p.metodo==="pix"?"PIX":"Cartão"}</small></div><span class="st ${escH(p.status)}">${escH(p.statusTexto)}</span></div>
+        ${n>=0?`<div class="trilha">${ETAPAS.map((x,k)=>`<i class="${k<=n?"on":""}"></i>`).join("")}</div><small>Pago → Separando → Enviado → Entregue</small>`:""}
+        <ul>${(p.itens||[]).map(i=>`<li>${i.q}x ${escH(i.nome)} — Nº ${i.t}</li>`).join("")}</ul>
+        <small>Total: <b style="color:var(--ink)">${brl(p.total)}</b>${p.frete?` · Frete: ${escH(p.frete.nome)}${p.frete.valor?" "+brl(p.frete.valor):" grátis"}`:""}</small>
+        <small>Entrega: ${escH(`${e.rua||""}, ${e.numero||""} ${e.comp||""} — ${e.bairro||""} — ${e.cidade||""}/${e.uf||""}`)}</small>
+        ${p.rastreio?`<div class="rastreio">Rastreio: <b>${escH(p.rastreio)}</b> · <a href="https://www.melhorrastreio.com.br" target="_blank" rel="noopener" style="text-decoration:underline">acompanhar</a></div>`:""}
+        ${p.status==="aguardando"?`<small style="margin-top:6px">Aguardando a confirmação do pagamento pelo Mercado Pago.</small>`:""}
+      </div>`;}).join("") : `<p class="muted" style="text-align:left">Você ainda não tem pedidos com o e-mail ${escH(c.email)}.<br><br>Os pedidos feitos com este e-mail aparecem aqui automaticamente.</p>`;
+  } else {
+    const e=c.endereco||{};
+    a.innerHTML = `<form class="cform" id="cD">
+      <label>Nome completo<input name="nome" value="${escH(c.nome)}" required></label>
+      <label>E-mail<input value="${escH(c.email)}" disabled></label>
+      <label>WhatsApp<input name="fone" inputmode="tel" value="${escH(c.fone)}" placeholder="(46) 99999-9999"></label>
+      <div class="duo"><label>CEP<input name="cep" inputmode="numeric" maxlength="9" value="${escH(e.cep)}" oninput="maskCep(this)"></label><label>Número<input name="numero" value="${escH(e.numero)}"></label></div>
+      <label>Rua<input name="rua" value="${escH(e.rua)}"></label>
+      <label>Complemento<input name="comp" value="${escH(e.comp)}"></label>
+      <label>Bairro<input name="bairro" value="${escH(e.bairro)}"></label>
+      <div class="duo"><label>Cidade<input name="cidade" value="${escH(e.cidade)}"></label><label>UF<input name="uf" maxlength="2" value="${escH(e.uf)}"></label></div>
+      <div class="cmsg" id="cDMsg"></div><button class="cbtn">Salvar dados</button>
+      <p style="font-size:12px;color:var(--mute)">Esses dados já vêm preenchidos quando você finalizar uma compra.</p></form>
+      <form class="cform" id="cS" style="margin-top:18px"><b style="font-size:14px">Trocar senha</b>
+      <label>Senha atual<input name="atual" type="password" autocomplete="current-password" required></label>
+      <label>Nova senha (mínimo 8)<input name="nova" type="password" minlength="8" autocomplete="new-password" required></label>
+      <div class="cmsg" id="cSMsg"></div><button class="cbtn ghost">Trocar senha</button></form>`;
+    $("cD").onsubmit = async ev=>{ ev.preventDefault(); const v=Object.fromEntries(new FormData(ev.target)), m=$("cDMsg");
+      try{ const j=await apiConta("salvar",{nome:v.nome,fone:v.fone,endereco:{cep:v.cep,rua:v.rua,numero:v.numero,comp:v.comp,bairro:v.bairro,cidade:v.cidade,uf:v.uf}});
+        sessao.conta=j.conta; save("ks_sessao",sessao); m.className="cmsg ok"; m.textContent="✓ Dados salvos"; }catch(e){ m.className="cmsg"; m.textContent=e.message; } };
+    $("cS").onsubmit = async ev=>{ ev.preventDefault(); const v=Object.fromEntries(new FormData(ev.target)), m=$("cSMsg");
+      try{ await apiConta("trocarSenha",v); ev.target.reset(); m.className="cmsg ok"; m.textContent="✓ Senha alterada"; }catch(e){ m.className="cmsg"; m.textContent=e.message; } };
+  }
 }
 
 </script>
 <script type="module">
-import * as C from "./catalogo.js?v=2026-11-27d";  /* troque o v= sempre que mudar o catálogo */
+import * as C from "./catalogo.js?v=2026-11-27f";  /* troque o v= sempre que mudar o catálogo */
 Object.assign(window, C);
-init(); retornoPagamento();
+init(); marcaConta(); retornoPagamento();
 </script>
 </body>
 </html>

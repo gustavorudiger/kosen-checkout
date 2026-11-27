@@ -9,8 +9,12 @@ export default async (req) => {
     const opcoes = await cotarFrete(b.cep, Array.isArray(b.itens) ? b.itens.slice(0, 30) : []);
     return Response.json({ opcoes });
   } catch (e) {
-    return Response.json({ erro: e.message }, { status: 400 });
+    return Response.json({ erro: e.message === "CEP inválido" ? "CEP inválido" : "Não foi possível calcular o frete agora." }, { status: 400 });
   }
 };
 
-export const config = { path: "/api/frete", method: "POST" };
+export const config = {
+  path: "/api/frete",
+  method: "POST",
+  rateLimit: { windowLimit: 30, windowSize: 60, aggregateBy: ["ip", "domain"] },
+};
