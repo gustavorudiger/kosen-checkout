@@ -264,6 +264,46 @@
   .pay-pix{background:var(--ink);color:var(--cream)}
   .pay-pix small{color:var(--cream);opacity:.8}
   .pay[disabled]{opacity:.5;cursor:wait}
+  /* Formas de pagamento (cartões selecionáveis) */
+  .ck-steps{display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+  .ck-steps i{flex:1;height:1px;background:var(--line)}
+  .ck-steps span{display:flex;align-items:center;gap:6px}
+  .ck-steps b{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--ink);font-size:11px}
+  .ck-steps .on{color:var(--ink)} .ck-steps .on b{background:var(--ink);color:var(--cream)}
+  .pm{display:flex;flex-direction:column;gap:10px}
+  .pm-opt{position:relative;border:1.5px solid var(--line);border-radius:16px;background:#fff;transition:border-color .2s,box-shadow .2s}
+  .pm-opt.sel{border-color:var(--ink);box-shadow:0 6px 22px rgba(25,25,25,.08)}
+  .pm-head{display:grid;grid-template-columns:22px 44px 1fr auto;align-items:center;gap:12px;width:100%;padding:14px;text-align:left}
+  .pm-radio{width:22px;height:22px;border-radius:50%;border:1.5px solid #c9c3b7;display:grid;place-items:center;transition:border-color .2s}
+  .pm-radio::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--ink);transform:scale(0);transition:transform .2s}
+  .pm-opt.sel .pm-radio{border-color:var(--ink)} .pm-opt.sel .pm-radio::after{transform:scale(1)}
+  .pm-ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--soft)}
+  .pm-ico.pix{background:#e6f4f1;color:#2a9d8f} .pm-ico.card{background:var(--ink);color:var(--cream)}
+  .pm-txt b{display:flex;align-items:center;gap:6px;font-size:15px}
+  .pm-txt small{display:block;font-size:12px;color:var(--mute);margin-top:2px}
+  .pm-tag{font-size:10px;font-weight:800;letter-spacing:.04em;padding:3px 7px;border-radius:999px;background:var(--ok);color:#fff}
+  .pm-val{text-align:right}
+  .pm-val b{display:block;font-size:15px;font-weight:800;white-space:nowrap}
+  .pm-val s{font-size:11.5px;color:var(--mute)}
+  .pm-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s}
+  .pm-opt.sel .pm-body{grid-template-rows:1fr}
+  .pm-body>div{overflow:hidden}
+  .pm-in{margin:0 14px 14px;padding-top:12px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--mute)}
+  .pm-in ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .pm-in li{display:flex;gap:8px;align-items:flex-start}
+  .pm-in li::before{content:"✓";color:var(--ok);font-weight:800}
+  .pm-save{margin-top:10px;padding:9px 12px;border-radius:10px;background:#edf5ef;color:var(--ok);font-weight:700}
+  .pm-brands{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+  .pm-brands span{font-size:9.5px;font-weight:800;letter-spacing:.06em;padding:4px 7px;border-radius:5px;border:1px solid var(--line);color:var(--ink);background:var(--paper)}
+  .pm-parc{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .pm-parc div{display:flex;justify-content:space-between;padding:7px 10px;border-radius:9px;background:var(--paper);color:var(--ink);font-size:12px}
+  .pm-parc div b{font-weight:700}
+  .pm-parc small{grid-column:1/-1;font-size:11px;color:var(--mute);margin-top:2px}
+  .pm-go{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;margin-top:14px;border-radius:999px;background:var(--ink);color:var(--cream);font-weight:700;font-size:15px;transition:transform .15s,opacity .2s}
+  .pm-go:active{transform:scale(.98)} .pm-go[disabled]{opacity:.55;cursor:wait}
+  .pm-trust{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;font-size:11.5px;color:var(--mute)}
+  .pm-trust span{display:flex;align-items:center;gap:5px}
+  @media (max-width:380px){.pm-head{grid-template-columns:22px 38px 1fr auto;gap:9px;padding:12px}.pm-ico{width:38px;height:38px}.pm-parc{grid-template-columns:1fr}}
   .ck-msg{font-size:13px;color:#c0392b;font-weight:600;min-height:4px;margin-bottom:6px}
   .paid{position:fixed;inset:0;z-index:120;background:rgba(25,25,25,.55);display:flex;align-items:center;justify-content:center;padding:20px}
   .paid div{background:#fff;border-radius:20px;padding:28px;max-width:420px;text-align:center}
@@ -561,11 +601,41 @@
       <label>Cidade<input id="fCidade"></label>
       <label>UF<input id="fUf" maxlength="2"></label>
     </div>
+    <div class="ck-steps"><span class="on"><b>✓</b>Entrega</span><i></i><span class="on"><b>2</b>Pagamento</span><i></i><span><b>3</b>Pronto</span></div>
     <h4>Como você quer pagar?</h4>
-    <button class="pay pay-pix" onclick="pagar('pix')"><span><b>PIX</b><small>5% OFF · aprovação na hora</small></span><b id="ckTotPix"></b></button>
-    <button class="pay" onclick="pagar('cartao')"><span><b>Cartão de crédito</b><small id="ckTotCard"></small></span><b>›</b></button>
-    <div class="ck-msg" id="ckMsg"></div>
-    <p class="muted" style="text-align:center">🔒 Você será levado ao ambiente seguro do Mercado Pago. A Kosen não recebe os dados do seu cartão.</p>
+    <div class="pm" role="radiogroup" aria-label="Forma de pagamento">
+      <div class="pm-opt sel" id="pmPix">
+        <button class="pm-head" role="radio" aria-checked="true" onclick="escolherPag('pix')">
+          <span class="pm-radio"></span>
+          <span class="pm-ico pix"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2.5 21.5 12 12 21.5 2.5 12z"/><path d="M7.5 9.5 12 14l4.5-4.5"/></svg></span>
+          <span class="pm-txt"><b>PIX <span class="pm-tag" id="pmPixTag">5% OFF</span></b><small>Aprovação na hora</small></span>
+          <span class="pm-val"><s id="pmPixDe"></s><b id="ckTotPix"></b></span>
+        </button>
+        <div class="pm-body"><div><div class="pm-in">
+          <ul><li>O QR Code e o código copia e cola aparecem na próxima tela</li><li>Pague pelo app do seu banco em poucos segundos</li><li>Seu pedido é liberado assim que o pagamento cai</li></ul>
+          <div class="pm-save" id="pmEconomia"></div>
+        </div></div></div>
+      </div>
+      <div class="pm-opt" id="pmCard">
+        <button class="pm-head" role="radio" aria-checked="false" onclick="escolherPag('cartao')">
+          <span class="pm-radio"></span>
+          <span class="pm-ico card"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19M6 15h4"/></svg></span>
+          <span class="pm-txt"><b>Cartão de crédito</b><small id="ckTotCard"></small></span>
+          <span class="pm-val"><b id="pmCardVal"></b></span>
+        </button>
+        <div class="pm-body"><div><div class="pm-in">
+          <div class="pm-brands"><span>VISA</span><span>MASTERCARD</span><span>ELO</span><span>AMEX</span><span>HIPERCARD</span></div>
+          <div class="pm-parc" id="pmParc"></div>
+        </div></div></div>
+      </div>
+    </div>
+    <button class="pm-go" id="pmGo" onclick="pagar(pagSel)"></button>
+    <div class="ck-msg" id="ckMsg" style="margin-top:8px;text-align:center"></div>
+    <div class="pm-trust">
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Compra 100% segura</span>
+      <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Processado pelo Mercado Pago</span>
+    </div>
+    <p class="muted" style="text-align:center">Você conclui o pagamento no ambiente seguro do Mercado Pago. A Kosen não recebe os dados do seu cartão.</p>
   </div>
   <div class="drawer-f" id="cartFoot">
     <div class="row"><span>Subtotal</span><b id="sub">R$ 0,00</b></div>
@@ -805,7 +875,7 @@ function renderCart(){
   }catch(e){}
   $("tot").textContent = brl(totPix);
   $("parc").textContent = `${brl(cartao)} em ${LOJA.parcelas}x de ${brl(cartao/LOJA.parcelas)}`;
-  $("ckTotPix").textContent = brl(totPix); $("ckTotCard").textContent = `${brl(cartao)} em até ${LOJA.parcelas}x sem juros`;
+  ckTot = {pix:totPix, card:cartao}; renderPag();
   const linhas = T.items.map(i=>`• ${i.q}x ${i.p.nome} — Nº ${i.t} — ${brl(i.p.preco*i.q)}`).join("\n");
   const freteTxt = T.gratis ? ("Grátis" + (ship&&ship.prazo ? ` (chega em ${ship.prazo})` : "")) : ship ? `${brl(T.frete)} (${ship.nome})` : "a calcular";
   const msg = `Olá! Quero fazer este pedido na ${LOJA.nome}:\n\n${linhas}\n\nSubtotal: ${brl(T.sub)}`
@@ -872,9 +942,34 @@ function abrirCheckout(){
   [["fNome","nome"],["fEmail","email"],["fFone","fone"],["fCep","cep"],["fNum","numero"],["fRua","rua"],["fComp","comp"],["fBairro","bairro"],["fCidade","cidade"],["fUf","uf"]]
     .forEach(([i,k])=>{ if(!$(i).value && d[k]) $(i).value=d[k]; });
   if(!$("fCep").value && ship) $("fCep").value = ship.cep;
-  $("ckMsg").textContent=""; $("drawer").classList.add("ckon"); $("ck").scrollTop=0;
+  $("ckMsg").textContent=""; $("pmGo").disabled=false; escolherPag(pagSel); $("drawer").classList.add("ckon"); $("ck").scrollTop=0;
 }
+addEventListener("pageshow",()=>{ const g=$("pmGo"); if(g&&g.disabled){ g.disabled=false; renderPag(); } });
 function fecharCheckout(){ $("drawer").classList.remove("ckon"); }
+let pagSel = "pix", ckTot = {pix:0, card:0};
+function escolherPag(m){
+  pagSel = m;
+  [["pmPix","pix"],["pmCard","cartao"]].forEach(([id,v])=>{
+    const on = v===m; $(id).classList.toggle("sel",on);
+    $(id).querySelector(".pm-head").setAttribute("aria-checked",on);
+  });
+  $("ckMsg").textContent=""; renderPag();
+}
+function renderPag(){
+  const {pix:tp, card:tc} = ckTot, n = LOJA.parcelas, eco = Math.max(0, tc-tp);
+  $("ckTotPix").textContent = brl(tp);
+  $("pmPixDe").textContent = eco>0.009 ? brl(tc) : "";
+  $("pmPixTag").textContent = Math.round(LOJA.descontoPix*100)+"% OFF";
+  $("pmEconomia").textContent = eco>0.009 ? `Você economiza ${brl(eco)} pagando no PIX` : "Pagamento instantâneo e seguro";
+  $("ckTotCard").textContent = `Em até ${n}x de ${brl(tc/n)} sem juros`;
+  $("pmCardVal").textContent = brl(tc);
+  let h=""; for(let k=1;k<=n;k++) h+=`<div><span>${k}x</span><b>${brl(tc/k)}</b></div>`;
+  $("pmParc").innerHTML = h + `<small>Sem juros em todas as opções. Você escolhe as parcelas na próxima tela.</small>`;
+  const go = $("pmGo");
+  if(!go.disabled) go.innerHTML = pagSel==="pix"
+    ? `Pagar ${brl(tp)} com PIX <span aria-hidden="true">→</span>`
+    : `Pagar com cartão · até ${n}x <span aria-hidden="true">→</span>`;
+}
 async function buscaCep(){
   const c = F("fCep").replace(/\D/g,"");
   if(c.length!==8) return;
@@ -896,7 +991,7 @@ async function pagar(metodo){
   if(!ok){ $("ckMsg").textContent="Confira os campos destacados (nome e sobrenome, e-mail, WhatsApp com DDD e endereço)."; return; }
   save("ks_cliente",cli);
   if(!ship || ship.cep.replace(/\D/g,"")!==cli.cep.replace(/\D/g,"")){ $("cepIn").value=cli.cep; await cotar(cli.cep); }
-  const bts=document.querySelectorAll(".pay"); bts.forEach(b=>b.disabled=true);
+  const bts=[$("pmGo")]; bts.forEach(b=>{b.disabled=true;b.textContent="Abrindo o pagamento seguro…";});
   $("ckMsg").style.color="var(--mute)"; $("ckMsg").textContent="Abrindo o pagamento seguro…";
   try{
     const r = await fetch("/api/checkout",{method:"POST",headers:{"Content-Type":"application/json"},
@@ -906,7 +1001,7 @@ async function pagar(metodo){
     location.href = j.url;
   }catch(e){
     $("ckMsg").style.color=""; $("ckMsg").textContent = e.message+" Se preferir, finalize pelo WhatsApp.";
-    bts.forEach(b=>b.disabled=false);
+    bts.forEach(b=>b.disabled=false); renderPag();
   }
 }
 async function retornoPagamento(){
